@@ -16,7 +16,6 @@ var tc = {
     blacklist: `\
       www.instagram.com
       twitter.com
-      vine.co
       imgur.com
       teams.microsoft.com
     `.replace(regStrip, ""),
@@ -38,7 +37,7 @@ var tc = {
 */
 function log(message, level) {
   verbosity = tc.settings.logLevel;
-	verbosity = 6; //TODO
+  verbosity = 6; //TODO
   if (typeof level === "undefined") {
     level = tc.settings.defaultLogLevel;
   }
@@ -66,7 +65,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     // UPDATE
     tc.settings.keyBindings.push({
       action: "slower",
-      key: String(storage.slowerKey) || "s"
+      key: String(storage.slowerKey) || "s",
       value: Number(storage.speedStep) || 0.1,
       force: false,
       predefined: true
@@ -156,9 +155,8 @@ function getKeyBindings(action, what = "value") {
 }
 
 function setKeyBindings(action, value) {
-  tc.settings.keyBindings.find((item) => item.action === action)[
-    "value"
-  ] = value;
+  tc.settings.keyBindings.find((item) => item.action === action)["value"] =
+    value;
 }
 
 function defineVideoController() {
@@ -346,22 +344,23 @@ function defineVideoController() {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
-    switch (true) {
-      case location.hostname == "www.amazon.com":
-      case location.hostname == "www.reddit.com":
+    switch (location.hostname) {
+      case "www.amazon.com":
+      case "www.reddit.com":
       case /hbogo\./.test(location.hostname):
         // insert before parent to bypass overlay
         this.parent.parentElement.insertBefore(fragment, this.parent);
         break;
-      case location.hostname == "www.facebook.com":
+      case "www.facebook.com":
         // this is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
-        let p = this.parent.parentElement.parentElement.parentElement
-          .parentElement.parentElement.parentElement.parentElement;
+        let p =
+          this.parent.parentElement.parentElement.parentElement.parentElement
+            .parentElement.parentElement.parentElement;
         p.insertBefore(fragment, p.firstChild);
         break;
-      case location.hostname == "tv.apple.com":
+      case "tv.apple.com":
         // insert after parent for correct stacking context
         this.parent.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
@@ -428,8 +427,7 @@ function setupListener() {
   function updateSpeedFromEvent(video) {
     // It's possible to get a rate change on a VIDEO/AUDIO that doesn't have
     // a video controller attached to it.  If we do, ignore it.
-    if (!video.vsc)
-      return;
+    if (!video.vsc) return;
     var speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate.toFixed(2));
@@ -483,7 +481,7 @@ function initializeWhenReady(document) {
   if (isBlacklisted()) {
     return;
   }
-  window.addEventListener('load', () => {
+  window.addEventListener("load", () => {
     initializeNow(window.document);
   });
   if (document) {
@@ -589,7 +587,7 @@ function initializeNow(document) {
           return false;
         }
 
-        let item = tc.settings.keyBindings.find((item) => item.key === key);
+        var item = tc.settings.keyBindings.find((item) => item.key === key);
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {
@@ -655,8 +653,7 @@ function initializeNow(document) {
                   (x) => x.tagName == "VIDEO"
                 )[0];
                 if (node) {
-                  if (node.vsc)
-                    node.vsc.remove();
+                  if (node.vsc) node.vsc.remove();
                   checkForVideo(node, node.parentNode || mutation.target, true);
                 }
               }

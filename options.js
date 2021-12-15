@@ -2,7 +2,7 @@ var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 // The default values for each setting
 var tcDefaults = {
-  speed: 1.0, // default speed
+  speed: 1.0, // default speed to play videos
   displayKey: "v", // is this used?
   rememberSpeed: false,
   audioBoolean: false,
