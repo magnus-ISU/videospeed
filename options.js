@@ -27,67 +27,14 @@ var tcDefaults = {
 
 var keyBindings = [];
 
-var keyCodeAliases = {
-  0: "null",
-  null: "null",
-  undefined: "null",
-  32: "Space",
-  37: "Left",
-  38: "Up",
-  39: "Right",
-  40: "Down",
-  96: "Num 0",
-  97: "Num 1",
-  98: "Num 2",
-  99: "Num 3",
-  100: "Num 4",
-  101: "Num 5",
-  102: "Num 6",
-  103: "Num 7",
-  104: "Num 8",
-  105: "Num 9",
-  106: "Num *",
-  107: "Num +",
-  109: "Num -",
-  110: "Num .",
-  111: "Num /",
-  112: "F1",
-  113: "F2",
-  114: "F3",
-  115: "F4",
-  116: "F5",
-  117: "F6",
-  118: "F7",
-  119: "F8",
-  120: "F9",
-  121: "F10",
-  122: "F11",
-  123: "F12",
-  186: ";",
-  188: "<",
-  189: "-",
-  187: "+",
-  190: ">",
-  191: "/",
-  192: "~",
-  219: "[",
-  220: "\\",
-  221: "]",
-  222: "'",
-  59:  ";",
-  61:  "+",
-  173: "-",
-};
-
 function recordKeyPress(e) {
   if (
     (e.keyCode >= 48 && e.keyCode <= 57) || // Numbers 0-9
     (e.keyCode >= 65 && e.keyCode <= 90) || // Letters A-Z
     keyCodeAliases[e.keyCode] // Other character keys
   ) {
-    e.target.value =
-      keyCodeAliases[e.keyCode] || String.fromCharCode(e.keyCode);
-    e.target.keyCode = e.keyCode;
+    e.target.value = getKeyCodeValue(e);
+    e.target.key = e.key;
 
     e.preventDefault();
     e.stopPropagation();
@@ -97,12 +44,12 @@ function recordKeyPress(e) {
   } else if (e.keyCode === 27) {
     // When esc clicked, clear input
     e.target.value = "null";
-    e.target.keyCode = null;
+    e.target.key = null;
   }
 }
 
 function inputFilterNumbersOnly(e) {
-  var char = String.fromCharCode(e.keyCode);
+  var char = e.key;
   if (!/[\d\.]$/.test(char) || !/^\d+(\.\d*)?$/.test(e.target.value + char)) {
     e.preventDefault();
     e.stopPropagation();
@@ -114,8 +61,7 @@ function inputFocus(e) {
 }
 
 function inputBlur(e) {
-  e.target.value =
-    keyCodeAliases[e.target.keyCode] || String.fromCharCode(e.target.keyCode);
+  e.target.value = getKeyCodeValue(e);
 }
 
 function updateShortcutInputText(inputId, keyCode) {
@@ -387,3 +333,62 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+function getKeyCodeValue(e) {
+  if (e.keyCode >= 65 && e.keyCode <= 90) { // Letters A-Z may be capital or lowercase
+    return e.key;
+  }
+  return keyCodeAliases[e.keyCode] || String.fromCharCode(e.keyCode);
+}
+
+const keyCodeAliases = {
+  0: "null",
+  null: "null",
+  undefined: "null",
+  32: "Space",
+  37: "Left",
+  38: "Up",
+  39: "Right",
+  40: "Down",
+  96: "Num 0",
+  97: "Num 1",
+  98: "Num 2",
+  99: "Num 3",
+  100: "Num 4",
+  101: "Num 5",
+  102: "Num 6",
+  103: "Num 7",
+  104: "Num 8",
+  105: "Num 9",
+  106: "Num *",
+  107: "Num +",
+  109: "Num -",
+  110: "Num .",
+  111: "Num /",
+  112: "F1",
+  113: "F2",
+  114: "F3",
+  115: "F4",
+  116: "F5",
+  117: "F6",
+  118: "F7",
+  119: "F8",
+  120: "F9",
+  121: "F10",
+  122: "F11",
+  123: "F12",
+  186: ";",
+  188: "<",
+  189: "-",
+  187: "+",
+  190: ">",
+  191: "/",
+  192: "~",
+  219: "[",
+  220: "\\",
+  221: "]",
+  222: "'",
+  59:  ";",
+  61:  "+",
+  173: "-",
+};
