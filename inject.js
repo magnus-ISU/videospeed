@@ -1,5 +1,3 @@
-var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-
 var tc = {
   settings: {
     lastSpeed: 1.0, // default 1x
@@ -37,24 +35,31 @@ var tc = {
 */
 function log(message, level) {
   verbosity = tc.settings.logLevel;
-  verbosity = 6; //TODO
-  if (typeof level === "undefined") {
-    level = tc.settings.defaultLogLevel;
-  }
+  let to_print = "";
   if (verbosity >= level) {
-    if (level === 2) {
-      console.log("ERROR:" + message);
-    } else if (level === 3) {
-      console.log("WARNING:" + message);
-    } else if (level === 4) {
-      console.log("INFO:" + message);
-    } else if (level === 5) {
-      console.log("DEBUG:" + message);
-    } else if (level === 6) {
-      console.log("DEBUG (VERBOSE):" + message);
-      console.trace();
+    switch (level) {
+      case 2:
+        to_print = "ERROR: ";
+        break;
+      case 3:
+        to_print = "WARNING: ";
+        break;
+      case 4:
+        to_print = "INFO: ";
+        break;
+      case 5:
+        to_print = "DEBUG: ";
+        break;
+      case 6:
+        to_print = "VERBOSE DEBUG: ";
+        console.trace();
+        break;
+      default:
+        console.log("ALERT: Please report how you got this to VideoSpeed");
+        console.trace();
     }
   }
+  console.log("Videospeed: " + to_print + message);
 }
 
 // TODO this has duplicated values from options.js, figure out how to only define information once

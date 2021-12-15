@@ -20,10 +20,10 @@ var tcDefaults = {
     { action: "fast", key: "g", value: 1.8, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
-    twitter.com
-    imgur.com
-    teams.microsoft.com
-  `.replace(regStrip, "")
+twitter.com
+imgur.com
+teams.microsoft.com
+`
 };
 
 var keyBindings = [];
@@ -136,7 +136,7 @@ function validate() {
         } catch (err) {
           status.textContent =
             "Error: Invalid blacklist regex: " + match + ". Unable to save";
-            return false;
+          return false;
         }
       }
     });
@@ -154,7 +154,9 @@ function save_options() {
   ); // Remove added shortcuts
 
   let rememberSpeed = document.getElementById("rememberSpeed").checked;
-  let forceLastSavedSpeed = document.getElementById("forceLastSavedSpeed").checked;
+  let forceLastSavedSpeed = document.getElementById(
+    "forceLastSavedSpeed"
+  ).checked;
   let audioBoolean = document.getElementById("audioBoolean").checked;
   let enabled = document.getElementById("enabled").checked;
   let startHidden = document.getElementById("startHidden").checked;
@@ -200,7 +202,8 @@ function save_options() {
 function restore_options() {
   chrome.storage.sync.get(tcDefaults, function (storage) {
     document.getElementById("rememberSpeed").checked = storage.rememberSpeed;
-    document.getElementById("forceLastSavedSpeed").checked = storage.forceLastSavedSpeed;
+    document.getElementById("forceLastSavedSpeed").checked =
+      storage.forceLastSavedSpeed;
     document.getElementById("audioBoolean").checked = storage.audioBoolean;
     document.getElementById("enabled").checked = storage.enabled;
     document.getElementById("startHidden").checked = storage.startHidden;
@@ -217,7 +220,7 @@ function restore_options() {
         predefined: true
       });
     }
-
+    
     for (let i in storage.keyBindings) {
       var item = storage.keyBindings[i];
       if (item.predefined) {
@@ -294,7 +297,10 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", show_experimental);
 
   function eventCaller(event, className, funcName) {
-    if (!event.target.classList || !event.target.classList.contains(className)) {
+    if (
+      !event.target.classList ||
+      !event.target.classList.contains(className)
+    ) {
       return;
     }
     funcName(event);
@@ -385,7 +391,7 @@ const keyCodeAliases = {
   220: "\\",
   221: "]",
   222: "'",
-  59:  ";",
-  61:  "+",
-  173: "-",
+  59: ";",
+  61: "+",
+  173: "-"
 };
