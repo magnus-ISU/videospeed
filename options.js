@@ -1,14 +1,15 @@
 var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
+// The default values for each setting
 var tcDefaults = {
-  speed: 1.0, // default:
-  displayKey: "v", // default: V
-  rememberSpeed: false, // default: false
-  audioBoolean: false, // default: false
-  startHidden: false, // default: false
-  forceLastSavedSpeed: false, //default: false
-  enabled: true, // default enabled
-  controllerOpacity: 0.3, // default: 0.3
+  speed: 1.0, // default speed
+  displayKey: "v", // is this used?
+  rememberSpeed: false,
+  audioBoolean: false,
+  startHidden: false,
+  forceLastSavedSpeed: false,
+  enabled: true,
+  controllerOpacity: 0.3,
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.1, force: false, predefined: true },
@@ -33,7 +34,7 @@ function recordKeyPress(e) {
     (e.keyCode >= 65 && e.keyCode <= 90) || // Letters A-Z
     keyCodeAliases[e.keyCode] // Other character keys
   ) {
-    e.target.value = getKeyCodeValue(e);
+    e.target.value = getKeyCodeName(e);
     e.target.key = e.key;
     e.target.keyCode = e.keyCode;
 
@@ -51,8 +52,8 @@ function recordKeyPress(e) {
 }
 
 function inputFilterNumbersOnly(e) {
-  var char = e.key;
-  if (!/[\d\.]$/.test(char) || !/^\d+(\.\d*)?$/.test(e.target.value + char)) {
+  var chr = e.key;
+  if (!/[\d\.]$/.test(chr) || !/^\d+(\.\d*)?$/.test(e.target.value + chr)) {
     e.preventDefault();
     e.stopPropagation();
   }
@@ -63,12 +64,12 @@ function inputFocus(e) {
 }
 
 function inputBlur(e) {
-  e.target.value = getKeyCodeValue(e);
+  e.target.value = getKeyCodeName(e);
 }
 
-function updateCustomShortcutInputText(inputItem, keyCode) {
-  inputItem.value = keyCodeAliases[keyCode] || String.fromCharCode(keyCode);
-  inputItem.keyCode = keyCode;
+function updateCustomShortcutInputText(inputItem, key) {
+  inputItem.value = key;
+  inputItem.key = key;
 }
 
 // List of custom actions for which there is no numeric argument
@@ -166,12 +167,12 @@ function save_options() {
     "fastSpeed",
     "rewindTime",
     "advanceTime",
-    "resetKeyCode",
-    "slowerKeyCode",
-    "fasterKeyCode",
-    "rewindKeyCode",
-    "advanceKeyCode",
-    "fastKeyCode"
+    "resetKey",
+    "slowerKey",
+    "fasterKey",
+    "rewindKey",
+    "advanceKey",
+    "fastKey"
   ]);
   chrome.storage.sync.set(
     {
@@ -328,13 +329,15 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-function getKeyCodeValue(e) {
-  if (e.keyCode >= 65 && e.keyCode <= 90) { // Letters A-Z may be capital or lowercase
+function getKeyCodeName(e) {
+  // Letters A-Z may be capital or lowercase
+  if (e.keyCode >= 65 && e.keyCode <= 90) {
     return e.key;
   }
   return keyCodeAliases[e.keyCode] || String.fromCharCode(e.keyCode);
 }
 
+// May be a prettier name than e.key
 const keyCodeAliases = {
   0: "null",
   null: "null",
