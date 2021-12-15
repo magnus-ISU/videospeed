@@ -6,7 +6,7 @@ var tc = {
     enabled: true, // default enabled
     speeds: {}, // empty object to hold speed for each source
 
-    displayKeyCode: 86, // default: V
+    displayKey: "v", // default: V
     rememberSpeed: false, // default: false
     forceLastSavedSpeed: false, //default: false
     audioBoolean: false, // default: false
@@ -57,6 +57,7 @@ function log(message, level) {
   }
 }
 
+// TODO this has duplicated values from options.js, figure out how to only define information once
 chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.keyBindings = storage.keyBindings; // Array
   if (storage.keyBindings.length == 0) {
@@ -64,52 +65,52 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     // UPDATE
     tc.settings.keyBindings.push({
       action: "slower",
-      key: Number(storage.slowerKeyCode) || 83,
+      key: String(storage.slowerKey) || "s"
       value: Number(storage.speedStep) || 0.1,
       force: false,
       predefined: true
-    }); // default S
+    });
     tc.settings.keyBindings.push({
       action: "faster",
-      key: Number(storage.fasterKeyCode) || 68,
+      key: String(storage.fasterKey) || "d",
       value: Number(storage.speedStep) || 0.1,
       force: false,
       predefined: true
-    }); // default: D
+    });
     tc.settings.keyBindings.push({
       action: "rewind",
-      key: Number(storage.rewindKeyCode) || 90,
+      key: String(storage.rewindKey) || "z",
       value: Number(storage.rewindTime) || 10,
       force: false,
       predefined: true
-    }); // default: Z
+    });
     tc.settings.keyBindings.push({
       action: "advance",
-      key: Number(storage.advanceKeyCode) || 88,
+      key: String(storage.advanceKey) || "x",
       value: Number(storage.advanceTime) || 10,
       force: false,
       predefined: true
-    }); // default: X
+    });
     tc.settings.keyBindings.push({
       action: "reset",
-      key: Number(storage.resetKeyCode) || 82,
+      key: String(storage.resetKey) || "r",
       value: 1.0,
       force: false,
       predefined: true
-    }); // default: R
+    });
     tc.settings.keyBindings.push({
       action: "fast",
-      key: Number(storage.fastKeyCode) || 71,
+      key: String(storage.fastKey) || "g",
       value: Number(storage.fastSpeed) || 1.8,
       force: false,
       predefined: true
-    }); // default: G
+    });
     tc.settings.version = "0.5.3";
 
     chrome.storage.sync.set({
       keyBindings: tc.settings.keyBindings,
       version: tc.settings.version,
-      displayKeyCode: tc.settings.displayKeyCode,
+      displayKey: tc.settings.displayKey,
       rememberSpeed: tc.settings.rememberSpeed,
       forceLastSavedSpeed: tc.settings.forceLastSavedSpeed,
       audioBoolean: tc.settings.audioBoolean,
@@ -120,7 +121,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     });
   }
   tc.settings.lastSpeed = Number(storage.lastSpeed);
-  tc.settings.displayKeyCode = Number(storage.displayKeyCode);
+  tc.settings.displayKey = String(storage.displayKey);
   tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
   tc.settings.forceLastSavedSpeed = Boolean(storage.forceLastSavedSpeed);
   tc.settings.audioBoolean = Boolean(storage.audioBoolean);
@@ -135,11 +136,11 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   ) {
     tc.settings.keyBindings.push({
       action: "display",
-      key: Number(storage.displayKeyCode) || 86,
+      key: String(storage.displayKey) || "v",
       value: 0,
       force: false,
       predefined: true
-    }); // default V
+    });
   }
 
   initializeWhenReady(document);
@@ -556,8 +557,8 @@ function initializeNow(document) {
     doc.addEventListener(
       "keydown",
       function (event) {
-        var keyCode = event.keyCode;
-        log("Processing keydown event: " + keyCode, 6);
+        let key = event.key;
+        log("Processing keydown event: " + key, 6);
 
         // Ignore if following modifier is active.
         if (
@@ -569,7 +570,7 @@ function initializeNow(document) {
           event.getModifierState("Hyper") ||
           event.getModifierState("OS")
         ) {
-          log("Keydown event ignored due to active modifier: " + keyCode, 5);
+          log("Keydown event ignored due to active modifier: " + key, 5);
           return;
         }
 
@@ -587,7 +588,7 @@ function initializeNow(document) {
           return false;
         }
 
-        var item = tc.settings.keyBindings.find((item) => item.key === keyCode);
+        let item = tc.settings.keyBindings.find((item) => item.key === key);
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {

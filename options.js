@@ -2,7 +2,7 @@ var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 var tcDefaults = {
   speed: 1.0, // default:
-  displayKeyCode: 86, // default: V
+  displayKey: "v", // default: V
   rememberSpeed: false, // default: false
   audioBoolean: false, // default: false
   startHidden: false, // default: false
@@ -10,13 +10,13 @@ var tcDefaults = {
   enabled: true, // default enabled
   controllerOpacity: 0.3, // default: 0.3
   keyBindings: [
-    { action: "display", key: 86, value: 0, force: false, predefined: true }, // V
-    { action: "slower", key: 83, value: 0.1, force: false, predefined: true }, // S
-    { action: "faster", key: 68, value: 0.1, force: false, predefined: true }, // D
-    { action: "rewind", key: 90, value: 10, force: false, predefined: true }, // Z
-    { action: "advance", key: 88, value: 10, force: false, predefined: true }, // X
-    { action: "reset", key: 82, value: 1, force: false, predefined: true }, // R
-    { action: "fast", key: 71, value: 1.8, force: false, predefined: true } // G
+    { action: "display", key: "v", value: 0, force: false, predefined: true },
+    { action: "slower", key: "s", value: 0.1, force: false, predefined: true },
+    { action: "faster", key: "d", value: 0.1, force: false, predefined: true },
+    { action: "rewind", key: "z", value: 10, force: false, predefined: true },
+    { action: "advance", key: "x", value: 10, force: false, predefined: true },
+    { action: "reset", key: "r", value: 1, force: false, predefined: true },
+    { action: "fast", key: "g", value: 1.8, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
     twitter.com
@@ -35,16 +35,18 @@ function recordKeyPress(e) {
   ) {
     e.target.value = getKeyCodeValue(e);
     e.target.key = e.key;
+    e.target.keyCode = e.keyCode;
 
     e.preventDefault();
     e.stopPropagation();
   } else if (e.keyCode === 8) {
-    // Clear input when backspace pressed
+    // Clear input when backspace pressed, but keep the keycode the same
     e.target.value = "";
   } else if (e.keyCode === 27) {
-    // When esc clicked, clear input
+    // When esc clicked, clear input and unbind the key
     e.target.value = "null";
     e.target.key = null;
+    e.target.keyCode = null;
   }
 }
 
@@ -64,22 +66,16 @@ function inputBlur(e) {
   e.target.value = getKeyCodeValue(e);
 }
 
-function updateShortcutInputText(inputId, keyCode) {
-  document.getElementById(inputId).value =
-    keyCodeAliases[keyCode] || String.fromCharCode(keyCode);
-  document.getElementById(inputId).keyCode = keyCode;
-}
-
 function updateCustomShortcutInputText(inputItem, keyCode) {
   inputItem.value = keyCodeAliases[keyCode] || String.fromCharCode(keyCode);
   inputItem.keyCode = keyCode;
 }
 
-// List of custom actions for which customValue should be disabled
-var customActionsNoValues = ["pause", "muted", "mark", "jump", "display"];
+// List of custom actions for which there is no numeric argument
+const customActionsNoValues = ["pause", "muted", "mark", "jump", "display"];
 
 function add_shortcut() {
-  var html = `<select class="customDo">
+  const html = `<select class="customDo">
     <option value="slower">Decrease speed</option>
     <option value="faster">Increase speed</option>
     <option value="rewind">Rewind</option>
@@ -111,7 +107,7 @@ function add_shortcut() {
 
 function createKeyBindings(item) {
   const action = item.querySelector(".customDo").value;
-  const key = item.querySelector(".customKey").keyCode;
+  const key = item.querySelector(".customKey").key;
   const value = Number(item.querySelector(".customValue").value);
   const force = item.querySelector(".customForce").value;
   const predefined = !!item.id; //item.id ? true : false;
@@ -127,8 +123,7 @@ function createKeyBindings(item) {
 
 // Validates settings before saving
 function validate() {
-  var valid = true;
-  var status = document.getElementById("status");
+  let status = document.getElementById("status");
   document
     .getElementById("blacklist")
     .value.split("\n")
@@ -140,12 +135,11 @@ function validate() {
         } catch (err) {
           status.textContent =
             "Error: Invalid blacklist regex: " + match + ". Unable to save";
-          valid = false;
-          return;
+            return false;
         }
       }
     });
-  return valid;
+  return true;
 }
 
 // Saves options to chrome.storage
@@ -158,13 +152,13 @@ function save_options() {
     createKeyBindings(item)
   ); // Remove added shortcuts
 
-  var rememberSpeed = document.getElementById("rememberSpeed").checked;
-  var forceLastSavedSpeed = document.getElementById("forceLastSavedSpeed").checked;
-  var audioBoolean = document.getElementById("audioBoolean").checked;
-  var enabled = document.getElementById("enabled").checked;
-  var startHidden = document.getElementById("startHidden").checked;
-  var controllerOpacity = document.getElementById("controllerOpacity").value;
-  var blacklist = document.getElementById("blacklist").value;
+  let rememberSpeed = document.getElementById("rememberSpeed").checked;
+  let forceLastSavedSpeed = document.getElementById("forceLastSavedSpeed").checked;
+  let audioBoolean = document.getElementById("audioBoolean").checked;
+  let enabled = document.getElementById("enabled").checked;
+  let startHidden = document.getElementById("startHidden").checked;
+  let controllerOpacity = document.getElementById("controllerOpacity").value;
+  let blacklist = document.getElementById("blacklist").value;
 
   chrome.storage.sync.remove([
     "resetSpeed",
@@ -192,7 +186,7 @@ function save_options() {
     },
     function () {
       // Update status to let user know options were saved.
-      var status = document.getElementById("status");
+      let status = document.getElementById("status");
       status.textContent = "Options saved";
       setTimeout(function () {
         status.textContent = "";
@@ -229,7 +223,7 @@ function restore_options() {
         //do predefined ones because their value needed for overlay
         // document.querySelector("#" + item["action"] + " .customDo").value = item["action"];
         if (item["action"] == "display" && typeof item["key"] === "undefined") {
-          item["key"] = storage.displayKeyCode || tcDefaults.displayKeyCode; // V
+          item["key"] = storage.displayKey || tcDefaults.displayKey;
         }
 
         if (customActionsNoValues.includes(item["action"]))
