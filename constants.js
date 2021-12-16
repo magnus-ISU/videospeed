@@ -1,3 +1,4 @@
+//TODO verify accuracy of and fix this comment
 // Strips out whitespace before a line, I think
 export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
