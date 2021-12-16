@@ -12,11 +12,11 @@ var tc = {
     controllerOpacity: 0.3, // default: 0.3
     keyBindings: [],
     blacklist: `\
-      www.instagram.com
-      twitter.com
-      imgur.com
-      teams.microsoft.com
-    `.replace(regStrip, ""),
+www.instagram.com
+twitter.com
+imgur.com
+teams.microsoft.com
+`,
     defaultLogLevel: 4,
     logLevel: 3
   },
@@ -58,55 +58,75 @@ function log(message, level) {
         console.log("ALERT: Please report how you got this to VideoSpeed");
         console.trace();
     }
+    console.log("Videospeed: " + to_print + message);
   }
-  console.log("Videospeed: " + to_print + message);
+}
+
+// Needed because you cannot || with "undefined". Only used in the next function
+function storageToString(stored_key, default_key) {
+  if (stored_key) {
+    return String(stored_key);
+  } else {
+    return default_key;
+  }
 }
 
 // TODO this has duplicated values from options.js, figure out how to only define information once
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.keyBindings = storage.keyBindings; // Array
+
+  console.log(storage);
+
+  // The first time the extension runs...
   if (storage.keyBindings.length == 0) {
-    // if first initialization of 0.5.3
-    // UPDATE
     tc.settings.keyBindings.push({
       action: "slower",
-      key: String(storage.slowerKey) || "s",
+      key: storageToString(storage.slowerKey, "s"),
       value: Number(storage.speedStep) || 0.1,
       force: false,
       predefined: true
     });
     tc.settings.keyBindings.push({
       action: "faster",
-      key: String(storage.fasterKey) || "d",
+      key: storageToString(storage.fasterKey, "d"),
       value: Number(storage.speedStep) || 0.1,
       force: false,
       predefined: true
     });
     tc.settings.keyBindings.push({
       action: "rewind",
-      key: String(storage.rewindKey) || "z",
+      key: storageToString(storage.rewindKey, "z"),
       value: Number(storage.rewindTime) || 10,
       force: false,
       predefined: true
     });
     tc.settings.keyBindings.push({
       action: "advance",
-      key: String(storage.advanceKey) || "x",
+      key: storageToString(storage.advanceKey, "x"),
       value: Number(storage.advanceTime) || 10,
       force: false,
       predefined: true
     });
     tc.settings.keyBindings.push({
       action: "reset",
-      key: String(storage.resetKey) || "r",
+      key: storageToString(storage.resetKey, "r"),
       value: 1.0,
       force: false,
       predefined: true
     });
     tc.settings.keyBindings.push({
       action: "fast",
-      key: String(storage.fastKey) || "g",
+      key: storageToString(storage.fastKey, "g"),
       value: Number(storage.fastSpeed) || 1.8,
+      force: false,
+      predefined: true
+    });
+    // Remove migration from version 0.5.2
+    tc.settings.keyBindings.push({
+      action: "display",
+      key: storageToString(storage.displayKey, "v"),
+      value: 0,
       force: false,
       predefined: true
     });
@@ -134,19 +154,6 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.startHidden = Boolean(storage.startHidden);
   tc.settings.controllerOpacity = Number(storage.controllerOpacity);
   tc.settings.blacklist = String(storage.blacklist);
-
-  // ensure that there is a "display" binding (for upgrades from versions that had it as a separate binding)
-  if (
-    tc.settings.keyBindings.filter((x) => x.action == "display").length == 0
-  ) {
-    tc.settings.keyBindings.push({
-      action: "display",
-      key: String(storage.displayKey) || "v",
-      value: 0,
-      force: false,
-      predefined: true
-    });
-  }
 
   initializeWhenReady(document);
 });
@@ -502,6 +509,7 @@ function initializeWhenReady(document) {
   }
   log("End initializeWhenReady", 5);
 }
+
 function inIframe() {
   try {
     return window.self !== window.top;
@@ -509,6 +517,7 @@ function inIframe() {
     return true;
   }
 }
+
 function getShadow(parent) {
   let result = [];
   function getChild(parent) {

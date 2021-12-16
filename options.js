@@ -1,5 +1,3 @@
-var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-
 // The default values for each setting
 var tcDefaults = {
   speed: 1.0, // default speed to play videos
@@ -125,6 +123,7 @@ function createKeyBindings(item) {
 // Validates settings before saving
 function validate() {
   let status = document.getElementById("status");
+  const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
   document
     .getElementById("blacklist")
     .value.split("\n")
@@ -185,7 +184,7 @@ function save_options() {
       startHidden: startHidden,
       controllerOpacity: controllerOpacity,
       keyBindings: keyBindings,
-      blacklist: blacklist.replace(regStrip, "")
+      blacklist: blacklist
     },
     function () {
       // Update status to let user know options were saved.
