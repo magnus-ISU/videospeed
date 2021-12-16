@@ -191,7 +191,7 @@ function restore_options() {
     document.getElementById("controllerOpacity").value =
       storage.controllerOpacity;
     document.getElementById("blacklist").value = storage.blacklist;
-    
+
     for (let i in storage.keyBindings) {
       var item = storage.keyBindings[i];
       if (item.predefined) {
