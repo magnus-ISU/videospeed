@@ -11,15 +11,15 @@ teams.microsoft.com
 var tc = {
   settings: {
     lastSpeed: 1.0, // default 1x
-    enabled: true, // default enabled
+    enabled: true,
     speeds: {}, // empty object to hold speed for each source
 
-    displayKey: "v", // default: V
-    rememberSpeed: false, // default: false
-    forceLastSavedSpeed: false, //default: false
-    audioBoolean: false, // default: false
-    startHidden: false, // default: false
-    controllerOpacity: 0.3, // default: 0.3
+    displayKey: "v",
+    rememberSpeed: false,
+    forceLastSavedSpeed: false,
+    audioBoolean: false,
+    startHidden: false,
+    controllerOpacity: 0.3,
     keyBindings: [],
     blacklist: `\
 www.instagram.com
