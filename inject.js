@@ -1,3 +1,33 @@
+//import * as constants from "./constants.js";
+// Strips out whitespace before a line, I think
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+
+// The default values for each setting
+const tcDefaults = {
+    speed: 1.0, // default speed to play videos
+    displayKey: "v", // is this used?
+    rememberSpeed: false,
+    audioBoolean: false,
+    startHidden: false,
+    forceLastSavedSpeed: false,
+    enabled: true,
+    controllerOpacity: 0.3,
+    keyBindings: [
+      { action: "display", key: "v", value: 0, force: false, predefined: true },
+      { action: "slower", key: "s", value: 0.1, force: false, predefined: true },
+      { action: "faster", key: "d", value: 0.1, force: false, predefined: true },
+      { action: "rewind", key: "z", value: 10, force: false, predefined: true },
+      { action: "advance", key: "x", value: 10, force: false, predefined: true },
+      { action: "reset", key: "r", value: 1, force: false, predefined: true },
+      { action: "fast", key: "g", value: 1.8, force: false, predefined: true }
+    ],
+    blacklist: `www.instagram.com
+  twitter.com
+  imgur.com
+  teams.microsoft.com
+  `
+  };
+
 var tc = {
   settings: {
     lastSpeed: 1.0, // default 1x
@@ -71,8 +101,6 @@ function storageToString(stored_key, default_key) {
   }
 }
 
-// TODO this has duplicated values from options.js, figure out how to only define information once
-const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.keyBindings = storage.keyBindings; // Array
 
@@ -80,56 +108,9 @@ chrome.storage.sync.get(tc.settings, function (storage) {
 
   // The first time the extension runs...
   if (storage.keyBindings.length == 0) {
-    tc.settings.keyBindings.push({
-      action: "slower",
-      key: storageToString(storage.slowerKey, "s"),
-      value: Number(storage.speedStep) || 0.1,
-      force: false,
-      predefined: true
-    });
-    tc.settings.keyBindings.push({
-      action: "faster",
-      key: storageToString(storage.fasterKey, "d"),
-      value: Number(storage.speedStep) || 0.1,
-      force: false,
-      predefined: true
-    });
-    tc.settings.keyBindings.push({
-      action: "rewind",
-      key: storageToString(storage.rewindKey, "z"),
-      value: Number(storage.rewindTime) || 10,
-      force: false,
-      predefined: true
-    });
-    tc.settings.keyBindings.push({
-      action: "advance",
-      key: storageToString(storage.advanceKey, "x"),
-      value: Number(storage.advanceTime) || 10,
-      force: false,
-      predefined: true
-    });
-    tc.settings.keyBindings.push({
-      action: "reset",
-      key: storageToString(storage.resetKey, "r"),
-      value: 1.0,
-      force: false,
-      predefined: true
-    });
-    tc.settings.keyBindings.push({
-      action: "fast",
-      key: storageToString(storage.fastKey, "g"),
-      value: Number(storage.fastSpeed) || 1.8,
-      force: false,
-      predefined: true
-    });
-    // Remove migration from version 0.5.2
-    tc.settings.keyBindings.push({
-      action: "display",
-      key: storageToString(storage.displayKey, "v"),
-      value: 0,
-      force: false,
-      predefined: true
-    });
+    tc.settings.keyBindings = tcDefaults.keyBindings;
+
+    // Removed migration from version 0.5.2 to 0.5.3
     tc.settings.version = "0.5.3";
 
     chrome.storage.sync.set({
