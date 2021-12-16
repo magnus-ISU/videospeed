@@ -4,3 +4,5 @@ local
 # IntelliJ IDEA
 .idea/
 node_modules
+
+web-ext-artifacts
