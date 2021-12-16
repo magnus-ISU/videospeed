@@ -10,6 +10,7 @@ const tcDefaults = {
   forceLastSavedSpeed: false,
   enabled: true,
   controllerOpacity: 0.3,
+  controllerSize: "13px",
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.1, force: false, predefined: true },
@@ -40,6 +41,7 @@ var tc = {
     audioBoolean: false,
     startHidden: false,
     controllerOpacity: 0.3,
+    controllerSize: "13px",
     keyBindings: [],
     blacklist: `\
 www.instagram.com
@@ -113,6 +115,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
     //TODO what does this do?
     tc.settings.version = "0.5.3";
 
+    //TODO we should refactor tc so we can just call chrome.storage.sync.set(tc.settings)
     chrome.storage.sync.set({
       keyBindings: tc.settings.keyBindings,
       version: tc.settings.version,
@@ -123,6 +126,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
       startHidden: tc.settings.startHidden,
       enabled: tc.settings.enabled,
       controllerOpacity: tc.settings.controllerOpacity,
+      controllerSize: tc.settings.controllerSize,
       blacklist: tc.settings.blacklist.replace(regStrip, "")
     });
   }
@@ -134,6 +138,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.enabled = Boolean(storage.enabled);
   tc.settings.startHidden = Boolean(storage.startHidden);
   tc.settings.controllerOpacity = Number(storage.controllerOpacity);
+  tc.settings.controllerSize = String(storage.controllerSize);
   tc.settings.blacklist = String(storage.blacklist);
 
   initializeWhenReady(document);
@@ -287,7 +292,7 @@ function defineVideoController() {
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
           * {
-            font-size: 13px;
+            font-size:${tc.settings.controllerSize};
           }
         </style>
 
