@@ -336,32 +336,34 @@ function defineVideoController() {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
+    let p = this.parent;
     // This seemed strange to me at first, but switching on true here allows matching regexes
     switch (true) {
       case location.hostname == "www.amazon.com":
       case /\.*.reddit.com/.test(location.hostname):
       case /hbogo\./.test(location.hostname):
         // insert before parent to bypass overlay
-        this.parent.parentElement.insertBefore(fragment, this.parent);
+        p = p.parentElement;
         break;
       case location.hostname == "www.facebook.com":
         // this is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
-        let p =
-          this.parent.parentElement.parentElement.parentElement.parentElement
-            .parentElement.parentElement.parentElement;
-        p.insertBefore(fragment, p.firstChild);
+        p = p.parentElement.parentElement.parentElement
+          .parentElement.parentElement.parentElement.parentElement;
+        break;
+      case location.hostname == "www.netflix.com":
+        p = p.parentElement.parentElement.parentElement;
         break;
       case location.hostname == "tv.apple.com":
         // insert after parent for correct stacking context
-        this.parent.getRootNode().querySelector(".scrim").prepend(fragment);
+        p.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
         // Note: when triggered via a MutationRecord, it's possible that the
         // target is not the immediate parent. This appends the controller as
         // the first element of the target, which may not be the parent.
-        this.parent.insertBefore(fragment, this.parent.firstChild);
     }
+    p.insertBefore(fragment,p.firstChild);
     return wrapper;
   };
 }
