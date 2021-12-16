@@ -24,8 +24,8 @@ export const tcDefaults = {
     { action: "fast", key: "g", value: 1.8, force: false, predefined: true }
   ],
   blacklist: `www.instagram.com
-  twitter.com
-  imgur.com
-  teams.microsoft.com
-  `
+twitter.com
+imgur.com
+teams.microsoft.com
+`
 };
