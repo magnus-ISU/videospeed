@@ -345,23 +345,23 @@ function defineVideoController() {
 
     let p = this.parent;
     switch (true) {
-      case location.hostname == "www.amazon.com":
+      case location.hostname === "www.amazon.com":
       case /\.*.reddit.com/.test(location.hostname):
       case /hbogo\./.test(location.hostname):
         // insert before parent to bypass overlay
         p = p.parentElement;
         break;
-      case location.hostname == "www.facebook.com":
+      case location.hostname === "www.facebook.com":
         // this is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
         p = p.parentElement.parentElement.parentElement
           .parentElement.parentElement.parentElement.parentElement;
         break;
-      case location.hostname == "www.netflix.com":
+      case location.hostname === "www.netflix.com":
         p = p.parentElement.parentElement.parentElement;
         break;
-      case location.hostname == "tv.apple.com":
+      case location.hostname === "tv.apple.com":
         // insert after parent for correct stacking context
         p.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
