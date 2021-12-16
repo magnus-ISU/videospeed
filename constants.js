@@ -23,7 +23,8 @@ export const tcDefaults = {
     { action: "reset", key: "r", value: 1, force: false, predefined: true },
     { action: "fast", key: "g", value: 1.8, force: false, predefined: true }
   ],
-  blacklist: `www.instagram.com
+  blacklist: `\
+www.instagram.com
 twitter.com
 imgur.com
 teams.microsoft.com
