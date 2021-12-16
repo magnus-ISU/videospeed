@@ -136,6 +136,7 @@ function save_options() {
   let enabled = document.getElementById("enabled").checked;
   let startHidden = document.getElementById("startHidden").checked;
   let controllerOpacity = document.getElementById("controllerOpacity").value;
+  let controllerSize = document.getElementById("controllerSize").value;
   let blacklist = document.getElementById("blacklist").value;
 
   chrome.storage.sync.remove([
@@ -159,6 +160,7 @@ function save_options() {
       enabled: enabled,
       startHidden: startHidden,
       controllerOpacity: controllerOpacity,
+      controllerSize: controllerSize,
       keyBindings: keyBindings,
       blacklist: blacklist
     },
@@ -184,6 +186,8 @@ function restore_options() {
     document.getElementById("startHidden").checked = storage.startHidden;
     document.getElementById("controllerOpacity").value =
       storage.controllerOpacity;
+    document.getElementById("controllerSize").value =
+      storage.controllerSize;
     document.getElementById("blacklist").value = storage.blacklist;
 
     for (let i in storage.keyBindings) {

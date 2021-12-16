@@ -14,6 +14,7 @@ export const tcDefaults = {
   forceLastSavedSpeed: false,
   enabled: true,
   controllerOpacity: 0.3,
+  controllerSize: "13px",
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.1, force: false, predefined: true },
