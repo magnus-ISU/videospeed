@@ -1,4 +1,5 @@
-//import * as constants from "./constants.js";
+// Firefox is a bad browser, except all the rest - this import is not possible
+//import {regStrip, tcDefaults} from "./constants.js";
 // Strips out whitespace before a line, I think
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
