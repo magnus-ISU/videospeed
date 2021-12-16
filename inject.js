@@ -1,11 +1,5 @@
 // Firefox is a bad browser, except all the rest - this import is not possible
-//import {regStrip, tcDefaults} from "./constants.js";
-const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-const tcDefaults = { speed: 1.0, displayKey: "v", rememberSpeed: false, audioBoolean: false, startHidden: false, forceLastSavedSpeed: false, enabled: true, controllerOpacity: 0.3, keyBindings: [ { action: "display", key: "v", value: 0, force: false, predefined: true }, { action: "slower", key: "s", value: 0.1, force: false, predefined: true }, { action: "faster", key: "d", value: 0.1, force: false, predefined: true }, { action: "rewind", key: "z", value: 10, force: false, predefined: true }, { action: "advance", key: "x", value: 10, force: false, predefined: true }, { action: "reset", key: "r", value: 1, force: false, predefined: true }, { action: "fast", key: "g", value: 1.8, force: false, predefined: true } ], blacklist: `www.instagram.com
-twitter.com
-imgur.com
-teams.microsoft.com
-` };
+import {regStrip, tcDefaults} from "./constants.js";
 
 //TODO parts of this this may be able to be refactored out by using tcDefaults
 var tc = {
