@@ -343,7 +343,6 @@ function defineVideoController() {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
-    console.log(this.parent);
     let p = this.parent;
     switch (true) {
       case location.hostname == "www.amazon.com":
