@@ -21,7 +21,7 @@ var tc = {
     startHidden: false,
     controllerOpacity: 0.3,
     keyBindings: [],
-    blacklist: `\
+    blacklist: `
 www.instagram.com
 twitter.com
 imgur.com
@@ -68,7 +68,7 @@ function log(message, level) {
         console.log("ALERT: Please report how you got this to VideoSpeed");
         console.trace();
     }
-    console.log("Videospeed: " + to_print + message);
+    console.log(to_print + message);
   }
 }
 
