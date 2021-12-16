@@ -266,8 +266,7 @@ function defineVideoController() {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
     const speed = this.video.playbackRate.toFixed(2);
-    var top = Math.max(this.video.offsetTop, 0) + "px",
-      left = Math.max(this.video.offsetLeft, 0) + "px";
+    const top = "0px", left = "0px";
 
     log("Speed variable set to: " + speed, 5);
 
