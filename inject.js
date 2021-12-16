@@ -337,14 +337,15 @@ function defineVideoController() {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
-    switch (location.hostname) {
-      case "www.amazon.com":
-      case "www.reddit.com":
+    // This seemed strange to me at first, but switching on true here allows matching regexes
+    switch (true) {
+      case location.hostname == "www.amazon.com":
+      case /\.*.reddit.com/.test(location.hostname):
       case /hbogo\./.test(location.hostname):
         // insert before parent to bypass overlay
         this.parent.parentElement.insertBefore(fragment, this.parent);
         break;
-      case "www.facebook.com":
+      case location.hostname == "www.facebook.com":
         // this is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
@@ -353,7 +354,7 @@ function defineVideoController() {
             .parentElement.parentElement.parentElement;
         p.insertBefore(fragment, p.firstChild);
         break;
-      case "tv.apple.com":
+      case location.hostname == "tv.apple.com":
         // insert after parent for correct stacking context
         this.parent.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
