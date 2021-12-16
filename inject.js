@@ -286,11 +286,14 @@ function defineVideoController() {
     var shadowTemplate = `
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
+          * {
+            font-size: 13px;
+          }
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${
       tc.settings.controllerOpacity
-    }">
+    };">
           <span data-action="drag" class="draggable">${speed}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
