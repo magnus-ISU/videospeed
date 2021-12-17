@@ -13,12 +13,12 @@ const tcDefaults = {
   controllerSize: "13px",
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
-    { action: "slower", key: "d", value: 0.25, force: false, predefined: true },
-    { action: "faster", key: "e", value: 0.25, force: false, predefined: true },
-    { action: "rewind", key: "s", value: 10, force: false, predefined: true },
-    { action: "advance", key: "f", value: 10, force: false, predefined: true },
-    { action: "reset", key: "q", value: 1, force: false, predefined: true },
-    { action: "fast", key: "a", value: 2.5, force: false, predefined: true }
+    { action: "slower", key: "s", value: 0.25, force: false, predefined: true },
+    { action: "faster", key: "d", value: 0.25, force: false, predefined: true },
+    { action: "rewind", key: "z", value: 10, force: false, predefined: true },
+    { action: "advance", key: "x", value: 10, force: false, predefined: true },
+    { action: "reset", key: "r", value: 1, force: false, predefined: true },
+    { action: "fast", key: "g", value: 2.5, force: false, predefined: true }
   ],
   blacklist: `\
 www.instagram.com
