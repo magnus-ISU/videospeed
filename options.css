@@ -8,8 +8,6 @@
 }
 
 :root {
-  color: #000;
-  background-color: #ddd;
   --clr-primary-gray: 112 112 112;
   --clr-secondary-gray: 238 238 238;
   --gutter: 1.75rem;
@@ -20,20 +18,35 @@
 }
 
 body {
-  color: #212121;
+  font: 0.875em;
+  color: #000;
+  background-color: #eee;
 }
 
 header {
-  backdrop-filter: blur(8px);
+  color: #000;
+  background-color: #ddd;
+  border-bottom: 2px solid;
   position: sticky;
   text-align: center;
   top: 0;
   z-index: 1;
 }
 
+@media (prefers-color-scheme: dark) {
+  header {
+    color: #fff;
+    background-color: #223;
+  }
+  body {
+    color: #fff;
+    background-color: #223;
+  }
+}
+
 main {
   margin: 0 auto;
-  max-width: 700px;
+  max-width: 800px;
   padding: 0 var(--gutter);
 }
 
@@ -105,12 +118,6 @@ button.removeParent {
   width: 3em;
 }
 
-/* (Do not) disable website keybindings */
-.customForce {
-  display: none;
-  width: 18.5em;
-}
-
 label {
   display: inline-block;
   margin-right: .75rem;
@@ -121,24 +128,4 @@ label {
 #status {
   height: 5rem;
   margin: 1rem;
-}
-
-ol {
-  margin-left: 3em;
-}
-
-hr {
-  border: 2px dashed;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #fff;
-    background-color: #223;
-  }
-
-  body {
-    color: #fff;
-    background-color: #223;
-  }
 }
