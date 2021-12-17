@@ -745,7 +745,7 @@ function runAction(action, value, e) {
         log("Increase speed", 5);
         // Maximum playback speed in Chrome is set to 16:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-        var s = Math.min(
+        const s = Math.min(
           (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
           16
         );
@@ -754,7 +754,7 @@ function runAction(action, value, e) {
         log("Decrease speed", 5);
         // Video min rate is 0.0625:
         // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-        var s = Math.max(v.playbackRate - value, 0.07);
+        const s = Math.max(v.playbackRate - value, 0.07);
         setSpeed(v, s);
       } else if (action === "reset") {
         log("Reset speed", 5);

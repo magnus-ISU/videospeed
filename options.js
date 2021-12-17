@@ -250,9 +250,11 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("restore")
     .addEventListener("click", restore_defaults);
+  /*
   document
     .getElementById("experimental")
     .addEventListener("click", show_experimental);
+  */
 
   function eventCaller(event, className, funcName) {
     if (
