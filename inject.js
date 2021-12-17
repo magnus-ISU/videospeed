@@ -1,4 +1,4 @@
-// Firefox is a bad browser, except all the rest - this import is not possible
+// Sadly, this import statement is not possible so we duplicate the contents of constants.js
 //import {regStrip, tcDefaults} from "./constants.js";
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const tcDefaults = {
@@ -105,8 +105,6 @@ function storageToString(stored_key, default_key) {
 
 chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.keyBindings = storage.keyBindings; // Array
-
-  console.log(storage);
 
   // The first time the extension runs...
   if (storage.keyBindings.length == 0) {
@@ -377,12 +375,11 @@ function defineVideoController() {
 }
 
 function escapeStringRegExp(str) {
-  matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+  const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
   return str.replace(matchOperatorsRe, "\\$&");
 }
 
 function isBlacklisted() {
-  blacklisted = false;
   tc.settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
     if (match.length == 0) {
