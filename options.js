@@ -164,12 +164,7 @@ function save_options() {
       blacklist: blacklist
     },
     function () {
-      // Update status to let user know options were saved.
-      let status = document.getElementById("status");
-      status.textContent = "Options saved";
-      setTimeout(function () {
-        status.textContent = "";
-      }, 1000);
+      updateStatus("Options saved");
     }
   );
 }
@@ -237,12 +232,7 @@ function restore_defaults() {
     document
       .querySelectorAll(".removeParent")
       .forEach((button) => button.click()); // Remove added shortcuts
-    // Update status to let user know options were saved.
-    var status = document.getElementById("status");
-    status.textContent = "Default options restored";
-    setTimeout(function () {
-      status.textContent = "";
-    }, 1000);
+    updateStatus("Default options restored");
   });
 }
 
@@ -309,6 +299,16 @@ function getKeyCodeName(e) {
     return e.key;
   }
   return keyCodeAliases[e.keyCode] || String.fromCharCode(e.keyCode);
+}
+
+function updateStatus(message) {
+  // Update status to let user know something
+  let status = document.getElementById("status");
+  status.textContent = message;
+  // Has a race condition, but I don't care
+  setTimeout(function () {
+    status.textContent = "";
+  }, 2500);
 }
 
 // May be a prettier name than e.key

@@ -59,7 +59,7 @@ section,
 h1 {
   font-size: 1.5rem;
   font-weight: bold;
-  padding: .75em;
+  padding: .75em 0em 0em 0em;
 }
 
 /* Section titles */
@@ -126,6 +126,7 @@ label {
 }
 
 #status {
-  height: 5rem;
-  margin: 1rem;
+  height: 1rem;
+  font: 0.5rem;
+  color: red;
 }

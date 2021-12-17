@@ -7,7 +7,7 @@
   "homepage_url": "https://github.com/codebicycle/videospeed",
   "browser_specific_settings": {
     "gecko": {
-      "id": "{7be2ba16-0f1e-4d93-9ebc-5164397477a9}"
+      "id": "videospeed@github.com.magnus-ISU.videospeed"
     }
   },
   "icons": {
