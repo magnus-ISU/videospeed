@@ -8,7 +8,8 @@
 }
 
 :root {
-  --clr-main: 255 255 255;
+  color: #000;
+  background-color: #ddd;
   --clr-primary-gray: 112 112 112;
   --clr-secondary-gray: 238 238 238;
   --gutter: 1.75rem;
@@ -20,13 +21,10 @@
 
 body {
   color: #212121;
-  font: .875rem system-ui;
 }
 
 header {
   backdrop-filter: blur(8px);
-  background: rgba(var(--clr-main) / .85);
-  border-bottom: 2px solid rgb(var(--clr-secondary-gray));
   position: sticky;
   text-align: center;
   top: 0;
@@ -120,10 +118,9 @@ label {
   width: 14em;
 }
 
-/* e.g. "Default options restored" */
 #status {
-  color: rgb(var(--clr-primary-gray));
-  display: inline-block;
+  height: 5rem;
+  margin: 1rem;
 }
 
 ol {
@@ -131,17 +128,17 @@ ol {
 }
 
 hr {
-  border: 2px dashed rgb(var(--clr-secondary-gray));
+  border: 2px dashed;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --clr-main: 36 38 40;
-    --clr-primary-gray: 238 238 238;
-    --clr-secondary-gray: 112 112 112;
+    color: #fff;
+    background-color: #223;
   }
 
   body {
     color: #fff;
+    background-color: #223;
   }
 }
