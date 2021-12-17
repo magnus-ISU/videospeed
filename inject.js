@@ -1,7 +1,7 @@
 // Sadly, this import statement is not possible so we duplicate the contents of constants.js
 //import {regStrip, tcDefaults} from "./constants.js";
-export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-export const tcDefaults = {
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+const tcDefaults = {
   speed: 1.0,
   displayKey: "v",
   rememberSpeed: false,
