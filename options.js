@@ -1,4 +1,3 @@
-// Firefox is a bad browser, except for all the rest - this import is not possible.
 import { regStrip, tcDefaults } from "./constants.js";
 
 var keyBindings = [];

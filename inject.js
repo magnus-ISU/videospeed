@@ -401,7 +401,7 @@ function isBlacklisted() {
       return;
     }
   });
-  return blacklisted;
+  return false;
 }
 
 var coolDown = false;
