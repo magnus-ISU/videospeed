@@ -50,8 +50,7 @@ main {
   padding: 0 var(--gutter);
 }
 
-section,
-#faq {
+section {
   margin: var(--gutter) 0;
 }
 
