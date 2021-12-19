@@ -1,3 +1,27 @@
+## Info
+
+This is a fork of [CodeBicycle's fork](https://github.com/codebicycle/videospeed) of the [Chromium upstream](https://github.com/igrigorik/videospeed).
+
+This fork is available on AMO here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/
+
+The major difference (as of 19 December 2021) is that CodeBicycle lags behind the chromium version, while this repository tracks ahead of it, including both unmerged patches to the settings UI which gives it a modern dark theme as well as breaking changes to the settings menu which allow for more fine-grained handling of keyboard input, and some fixes for specific websites such as netflix and reddit.
+
+Because I have seen how backwards compatability left crusty code in the original versions for multiple years while I rewrote large sections of it, I will make no promises about this extension working between versions. A complete reinstall of the extension may be (but probably will not be) required on every update, so I can iterate more quickly and correctly.
+
+## FAQ:
+
+**There's no audio above 4x speed!**
+
+Quite annoying indeed. [This is a bug in firefox itself, not the extension](https://bugzilla.mozilla.org/show_bug.cgi?id=1630569). Presently, nothing can be done about it.
+
+**A website doesn't work!**
+
+Open an issue here *with a link to a URL that has some odd behavior*.
+
+Websites known to have problems:
+ - [Soundcloud](https://github.com/codebicycle/videospeed/issues/163)
+ - [Regular](https://github.com/codebicycle/videospeed/issues/155) `mp4`s opened with `file:///` links
+
 # The science of accelerated playback
 
 **TL;DR: faster playback translates to better engagement and retention.**
@@ -60,23 +84,6 @@ listens both for lower and upper case values (i.e. you can use
 `Shift-<shortcut>`) if there is other functionality assigned to the lowercase
 key. This is not a perfect solution, as some sites may listen to both, but works
 most of the time.
-
-### FAQ
-
-**The video controls are not showing up?** This extension is only compatible
-with HTML5 video. If you don't see the controls showing up, chances are you are
-viewing a Flash video. If you want to confirm, try right-clicking on the video
-and inspect the menu: if it mentions flash, then that's the issue. That said,
-most sites will fallback to HTML5 if they detect that Flash is not available.
-You can try manually disabling Flash from the browser.
-
-**What is this fork of `igrigorik/videospeed` all about?** This fork of the
-[`igrigorik/videospeed`](https://github.com/igrigorik/videospeed) repository
-is a port of [`igrigorik`](https://github.com/igrigorik)'s videospeed Chrome 
-add-on for Firefox. This fork modifies the Chrome add-on code so that it works 
-in Firefox. This repo is the code behind the [Firefox Extension](https://addons.mozilla.org/en-us/firefox/addon/videospeed/)
-whereas the [`igrigorik/videospeed`](https://github.com/igrigorik/videospeed)
-repository contains the code behind the [Chrome Extension](https://chrome.google.com/webstore/detail/video-speed-controller/nffaoalbilbmmfgbnbgppjihopabppdk).
 
 ### License
 
