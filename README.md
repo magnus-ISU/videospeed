@@ -1,3 +1,9 @@
+This is a fork of https://github.com/codebicycle/videospeed  
+
+This fork is available on AMO here:  
+https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/
+
+
 # The science of accelerated playback
 
 **TL;DR: faster playback translates to better engagement and retention.**
