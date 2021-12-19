@@ -21,10 +21,12 @@ const tcDefaults = {
     { action: "fast", key: "g", value: 2.5, force: false, predefined: true }
   ],
   blacklist: `\
-www.instagram.com
-twitter.com
+hangouts.google.com
+meet.google.com
 imgur.com
+www.instagram.com
 teams.microsoft.com
+twitter.com
 `
 };
 
