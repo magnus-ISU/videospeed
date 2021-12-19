@@ -33,10 +33,6 @@
       "all_frames": true,
       "matches": ["http://*/*", "https://*/*", "file:///*"],
       "match_about_blank": true,
-      "exclude_matches": [
-        "https://hangouts.google.com/*",
-        "https://meet.google.com/*"
-      ],
       "css": ["inject.css"],
       "js": ["inject.js"]
     }
