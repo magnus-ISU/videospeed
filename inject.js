@@ -1,8 +1,19 @@
 // Sadly, this import statement is not possible so we duplicate the contents of constants.js
 //import {regStrip, tcDefaults} from "./constants.js";
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
-const tcDefaults = {
-  keyBindings: [
+
+// Define this explicitely since it is more efficient
+const settings_defaults = {
+  enabled: true,
+  startHidden: false,
+  rememberSpeed: false,
+  enforceDefaultSpeed: false,
+  affectAudio: false,
+  scrollDisabled: false,
+  controllerOpacity: 0.3,
+  controllerSize: 14,
+  defaultSpeed: 1.0,
+  keybindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.25, force: false, predefined: true },
     { action: "faster", key: "d", value: 0.25, force: false, predefined: true },
@@ -10,47 +21,14 @@ const tcDefaults = {
     { action: "advance", key: "x", value: 10, force: false, predefined: true },
     { action: "reset", key: "r", value: 1, force: false, predefined: true },
     { action: "fast", key: "g", value: 2.5, force: false, predefined: true }
-  ]
+  ],
+  blacklist: `\
+www.instagram.com
+twitter.com
+imgur.com
+teams.microsoft.com
+`
 };
-const settings = {
-  // types are "b"oolean, "i"nt, "s"tring
-  enabled: { type: "b", default: true, description: "Enable" },
-  startHidden: {
-    type: "b",
-    default: false,
-    description: "Hide controller by default"
-  },
-  rememberSpeed: {
-    type: "b",
-    default: false,
-    description: "Remember playback speed"
-  },
-  enforceDefaultSpeed: {
-    type: "b",
-    default: false,
-    description: "Enforce default speed"
-  },
-  affectAudio: { type: "b", default: false, description: "Work on Audio" },
-  scrollDisabled: {
-    type: "b",
-    default: false,
-    description: "Disable Ctrl+Shift+Scroll"
-  },
-  controllerOpacity: {
-    type: "i",
-    default: 0.3,
-    description: "Controller Opacity"
-  },
-  controllerSize: {
-    type: "i",
-    default: 14,
-    description: "Controller Size (px)"
-  },
-  defaultSpeed: { type: "i", default: 1.0, description: "Default speed" }
-};
-const objectMap = (obj, fn) =>
-  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
-const settings_defaults = objectMap(settings, (v) => v.default);
 
 //////////////////////// BEGIN INJECT.JS /////////////////////////
 // Chromium max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
@@ -60,8 +38,6 @@ const MIN_SPEED = 0.07;
 const AUDIBLE_SPEED = 4.0;
 
 var pageState = {
-  // Keybindings (this should be in settings, TODO refactor)
-  keyBindings: [],
   // Holds speed for each source
   speeds: {},
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
@@ -70,39 +46,11 @@ var pageState = {
 var cached_settings = settings_defaults;
 // TODO listen to changes in chrome.settings.sync
 
-// Needed because you cannot || with "undefined". Only used in the next lambda function when getting keybindings
-function storageToString(stored_key, default_key) {
-  if (stored_key) {
-    return String(stored_key);
-  } else {
-    return default_key;
-  }
-}
-
-chrome.storage.sync.get(
-  Object.assign({}, cached_settings, tcDefaults),
-  (storage) => {
-    cached_settings = storage;
-    tc.settings.keyBindings = storage.keyBindings; // Array
-
-    // If the keybindings array is empty, set it to the default. TODO fixme because shouldn't be necessary
-    if (storage.keyBindings.length == 0) {
-      pageState.keyBindings = tcDefaults.keyBindings;
-    }
-    tc.settings.lastSpeed = Number(storage.lastSpeed);
-    tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
-    tc.settings.forceLastSavedSpeed = Boolean(storage.forceLastSavedSpeed);
-    tc.settings.audioBoolean = Boolean(storage.audioBoolean);
-    tc.settings.enabled = Boolean(storage.enabled);
-    tc.settings.startHidden = Boolean(storage.startHidden);
-    tc.settings.scrollDisabled = Boolean(storage.scrollDisabled);
-    tc.settings.controllerOpacity = Number(storage.controllerOpacity);
-    tc.settings.controllerSize = String(storage.controllerSize);
-    tc.settings.blacklist = String(storage.blacklist);
-
-    initializeWhenReady(document);
-  }
-);
+chrome.storage.sync.get(cached_settings, (storage) => {
+  console.log(storage);
+  cached_settings = storage;
+  initializeWhenReady(document);
+});
 
 function getKeyBindings(action, what = "value") {
   try {
