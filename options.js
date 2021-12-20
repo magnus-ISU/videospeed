@@ -85,6 +85,7 @@ function add_shortcut() {
   );
 }
 
+// Takes in a div of a keybinding in the options document and returns a object with its info
 function createKeyBindings(item) {
   const action = item.querySelector(".customDo").value;
   const key = item.querySelector(".customKey").key;
@@ -92,13 +93,13 @@ function createKeyBindings(item) {
   const force = item.querySelector(".customForce").value;
   const predefined = !!item.id; //item.id ? true : false;
 
-  keyBindings.push({
+  return {
     action: action,
     key: key,
     value: value,
     force: force,
     predefined: predefined
-  });
+  };
 }
 
 // Validates blacklist before saving
@@ -137,9 +138,12 @@ function save_options() {
     } else if (v.type === "s") {
       return document.getElementById(k).value;
     } else if (v.type === "keybindings") {
-      return Array.from(document.querySelectorAll(".customs")).forEach((item) =>
-        createKeyBindings(item)
+      let arr = [];
+      Array.from(document.querySelectorAll(".customs")).forEach((item) =>
+        arr.push(createKeyBindings(item))
       );
+      console.log(arr);
+      return arr;
     }
   });
   chrome.storage.sync.set(settings_values, () => updateStatus("Options saved"));
