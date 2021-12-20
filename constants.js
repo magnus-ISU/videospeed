@@ -3,7 +3,7 @@
 export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 export const settings = {
-  // types we can easily add are "b"oolean, "i"nt, "s"tring
+  // types we can easily add are "b"oolean, "i"nt, "s"tring, "d"ummy
   // type, default are the only required fields
   // If either html or description is defined, will have an entry inserted into options.html
   enabled: { type: "b", default: true, description: "Enable" },
@@ -38,7 +38,7 @@ export const settings = {
     default: 14,
     description: "Controller Size (px)"
   },
-  lastSpeed: { type: "lastspeed", default: 1.0 },
+  lastSpeed: { type: "d", default: 1.0 },
   keybindings: {
     type: "keybindings",
     default: [

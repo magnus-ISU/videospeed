@@ -36,6 +36,9 @@ teams.microsoft.com
 const MAX_SPEED = 16.0;
 const MIN_SPEED = 0.07;
 const AUDIBLE_SPEED = 4.0;
+const SCROLL_MULTIPLIER = -0.001;
+
+const EVENT_IDENTIFIER = "videospeed";
 
 var pageState = {
   // Holds speed for each source
@@ -44,6 +47,7 @@ var pageState = {
   mediaElements: []
 };
 var cached_settings = settings_defaults;
+console.log(cached_settings);
 // TODO listen to changes in chrome.settings.sync
 
 chrome.storage.sync.get(cached_settings, (storage) => {
@@ -103,7 +107,6 @@ function defineVideoController() {
     var mediaEventAction = function (event) {
       storedSpeed = pageState.speeds[event.target.currentSrc];
       if (!storedSpeed) {
-        log("Overwriting stored speed to 1.0 (rememberSpeed disabled)", 4);
         storedSpeed = cached_settings.rememberSpeed
           ? cached_settings.lastSpeed
           : 1.0;
@@ -116,6 +119,7 @@ function defineVideoController() {
       // override a website's intentional initial speed setting,
       // interfering with the site's default behavior)
       // Magnus addendum: by checking if it is not 1, I think we resolve this problem; if teh user has a default speed, it is used, but if not, we leave the website alone
+      console.log(storedSpeed);
       if (storedSpeed != 1.0) {
         setSpeed(event.target, storedSpeed);
       }
@@ -348,7 +352,7 @@ function setupListener() {
        * video speed instead of all video speed change events.
        */
       if (cached_settings.forceVideospeed) {
-        if (event.detail && event.detail.origin === "videoSpeed") {
+        if (event.detail && event.detail.origin === EVENT_IDENTIFIER) {
           video.playbackRate = event.detail.speed;
           updateSpeedFromEvent(video);
         } else {
@@ -502,8 +506,7 @@ function initializeNow(document) {
           }
           event.preventDefault();
           event.stopPropagation();
-          console.log(event.deltaY);
-          runAction("faster", event.deltaY * -0.001);
+          runAction("faster", event.deltaY * SCROLL_MULTIPLIER);
         },
         { passive: false }
       );
@@ -651,7 +654,7 @@ function setSpeed(video, speed) {
   if (cached_settings.forceLastSavedSpeed) {
     video.dispatchEvent(
       new CustomEvent("ratechange", {
-        detail: { origin: "videoSpeed", speed: speedvalue }
+        detail: { origin: EVENT_IDENTIFIER, speed: speedvalue }
       })
     );
   } else {

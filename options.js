@@ -137,6 +137,8 @@ function save_options() {
       return Number.parseFloat(document.getElementById(k).value);
     } else if (v.type === "s") {
       return document.getElementById(k).value;
+    } else if (v.type === "d") {
+      return v.default;
     } else if (v.type === "keybindings") {
       let arr = [];
       Array.from(document.querySelectorAll(".customs")).forEach((item) =>
