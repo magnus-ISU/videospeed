@@ -28,7 +28,7 @@ teams.microsoft.com
 `
 };
 
-//TODO parts of this this may be able to be refactored out by using tcDefaults
+// TODO parts of this this may be able to be refactored out by using tcDefaults
 var tc = {
   settings: {
     lastSpeed: 1.0, // default 1x
@@ -81,7 +81,7 @@ function log(message, level) {
         console.trace();
         break;
       default:
-        console.log("ALERT: Please report how you got this to VideoSpeed");
+        console.log("ALERT: Please report on GitHub how you got this to VideoSpeed");
         console.trace();
     }
     console.log(to_print + message);
@@ -104,10 +104,10 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   if (storage.keyBindings.length == 0) {
     tc.settings.keyBindings = tcDefaults.keyBindings;
 
-    //TODO what does this do?
+    // TODO what does this do?
     tc.settings.version = "0.5.3";
 
-    //TODO we should refactor tc so we can just call chrome.storage.sync.set(tc.settings)
+    // TODO we should refactor tc so we can just call chrome.storage.sync.set(tc.settings)
     chrome.storage.sync.set({
       keyBindings: tc.settings.keyBindings,
       version: tc.settings.version,
@@ -175,14 +175,14 @@ function defineVideoController() {
     if (!tc.settings.rememberSpeed) {
       if (!storedSpeed) {
         log(
-          "Overwriting stored speed to 1.0 due to rememberSpeed being disabled",
+          "Overwriting stored speed to 1.0 because rememberSpeed is disabled",
           5
         );
         storedSpeed = 1.0;
       }
       setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
     } else {
-      log("Recalling stored speed due to rememberSpeed being enabled", 5);
+      log("Recalling stored speed because rememberSpeed is enabled", 5);
       storedSpeed = tc.settings.lastSpeed;
     }
 
@@ -195,7 +195,7 @@ function defineVideoController() {
       storedSpeed = tc.settings.speeds[event.target.currentSrc];
       if (!tc.settings.rememberSpeed) {
         if (!storedSpeed) {
-          log("Overwriting stored speed to 1.0 (rememberSpeed not enabled)", 4);
+          log("Overwriting stored speed to 1.0 (rememberSpeed disabled)", 4);
           storedSpeed = 1.0;
         }
         // resetSpeed isn't really a reset, it's a toggle
@@ -210,8 +210,8 @@ function defineVideoController() {
       }
       // TODO: Check if explicitly setting the playback rate to 1.0 is
       // necessary when rememberSpeed is disabled (this may accidentally
-      // override a website's intentional initial speed setting interfering
-      // with the site's default behavior)
+      // override a website's intentional initial speed setting,
+      // interfering with the site's default behavior)
       log("Explicitly setting playbackRate to: " + storedSpeed, 4);
       setSpeed(event.target, storedSpeed);
     };
@@ -338,16 +338,16 @@ function defineVideoController() {
     fragment.appendChild(wrapper);
 
     let p = this.parent;
-    // This seemed strange to me at first, but switching on true here allows matching regexes
+    // This seemed strange at first, but switching on true here allows matching regexes
     switch (true) {
       case location.hostname === "www.amazon.com":
       case /\.*.reddit.com/.test(location.hostname):
       case /hbogo\./.test(location.hostname):
-        // insert before parent to bypass overlay
+        // Insert before parent to bypass overlay
         p = p.parentElement;
         break;
       case location.hostname === "www.facebook.com":
-        // this is a monstrosity but new FB design does not have *any*
+        // This is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
         p =
@@ -361,9 +361,9 @@ function defineVideoController() {
         // insert after parent for correct stacking context
         p.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
-      // Note: when triggered via a MutationRecord, it's possible that the
-      // target is not the immediate parent. This appends the controller as
-      // the first element of the target, which may not be the parent.
+        // Note: When triggered via a MutationRecord, it's possible that the
+        // target is not the immediate parent. This appends the controller as
+        // the first element of the target, which may not be the parent.
     }
     p.insertBefore(fragment, p.firstChild);
     return wrapper;
@@ -414,11 +414,11 @@ function refreshCoolDown() {
 
 function setupListener() {
   /**
-   * This function is run whenever a video speed rate change occurs.
-   * It is used to update the speed that shows up in the display as well as save
-   * that latest speed into the local storage.
+   * This function is called whenever a video speed rate change occurs.
+   * It's used to update the speed that shows up in the display as
+   * well as save that latest speed into local storage.
    *
-   * @param {*} video The video element to update the speed indicators for.
+   * @param {*} video = The video element for which to update the speed indicators
    */
   function updateSpeedFromEvent(video) {
     // It's possible to get a rate change on a VIDEO/AUDIO that doesn't have
@@ -557,7 +557,7 @@ function initializeNow(document) {
         let key = event.key;
         log("Processing keydown event: " + key, 6);
 
-        // Ignore if following modifier is active.
+        // Ignore if following modifier is active
         if (
           !event.getModifierState ||
           event.getModifierState("Alt") ||
@@ -580,7 +580,7 @@ function initializeNow(document) {
           return false;
         }
 
-        // Ignore keydown event if typing in a page without vsc
+        // Ignore keydown event if typing in a page without VSC
         if (!tc.mediaElements.length) {
           return false;
         }
@@ -589,7 +589,7 @@ function initializeNow(document) {
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {
-            // disable websites key bindings
+            // Disable websites key bindings
             event.preventDefault();
             event.stopPropagation();
           }
@@ -694,7 +694,7 @@ function initializeNow(document) {
 
   var frameTags = document.getElementsByTagName("iframe");
   Array.prototype.forEach.call(frameTags, function (frame) {
-    // Ignore frames we don't have permission to access (different origin).
+    // Ignore frames we don't have permission to access (different origin)
     try {
       var childDocument = frame.contentDocument;
     } catch (e) {
@@ -770,7 +770,7 @@ function runAction(action, value, e) {
         controller.classList.toggle("vsc-hidden");
       } else if (action === "blink") {
         log("Showing controller momentarily", 5);
-        // if vsc is hidden, show it briefly to give the use visual feedback that the action is excuted.
+        // If VSC is hidden, show it briefly to give the user visual feedback that the action was excuted
         if (
           controller.classList.contains("vsc-hidden") ||
           controller.blinkTimeOut !== undefined
@@ -854,7 +854,7 @@ function handleDrag(video, e) {
   const controller = video.vsc.div;
   const shadowController = controller.shadowRoot.querySelector("#controller");
 
-  // Find nearest parent of same size as video parent.
+  // Find nearest parent of same size as video parent
   var parentElement = controller.parentElement;
   while (
     parentElement.parentNode &&
