@@ -450,8 +450,8 @@ function initializeNow(document) {
     doc.addEventListener(
       "keydown",
       (event) => {
-        let key = event.key;
-        log("Processing keydown event: " + key, 6);
+        if (!cached_settings.enabled) return;
+        log("Processing keydown event: " + event.key, 6);
 
         // Ignore if following modifier is active
         if (
@@ -463,7 +463,7 @@ function initializeNow(document) {
           event.getModifierState("Hyper") ||
           event.getModifierState("OS")
         ) {
-          log("Keydown event ignored due to active modifier: " + key, 5);
+          log("Keydown event ignored due to active modifier: " + event.key, 5);
           return;
         }
 
@@ -482,7 +482,7 @@ function initializeNow(document) {
         }
 
         // TODO make keybindings a map so we can make this O(1)
-        let item = cached_settings.keybindings.find((item) => item.key === key);
+        let item = cached_settings.keybindings.find((item) => item.key === event.key);
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {
