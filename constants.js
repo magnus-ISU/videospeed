@@ -38,7 +38,7 @@ export const settings = {
     default: 14,
     description: "Controller Size (px)"
   },
-  defaultSpeed: { type: "i", default: 1.0, description: "Default speed" },
+  lastSpeed: { type: "lastspeed", default: 1.0 },
   keybindings: {
     type: "keybindings",
     default: [

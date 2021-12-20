@@ -12,7 +12,7 @@ const settings_defaults = {
   scrollDisabled: false,
   controllerOpacity: 0.3,
   controllerSize: 14,
-  defaultSpeed: 1.0,
+  lastSpeed: 1.0,
   keybindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.25, force: false, predefined: true },
@@ -56,7 +56,9 @@ chrome.storage.sync.get(cached_settings, (storage) => {
 
 function getKeyBindings(action, what = "value") {
   try {
-    return cached_settings.keybindings.find((item) => item.action === action)[what];
+    return cached_settings.keybindings.find((item) => item.action === action)[
+      what
+    ];
   } catch (e) {
     return false;
   }
@@ -87,7 +89,9 @@ function defineVideoController() {
     storedSpeed = pageState.speeds[target.currentSrc];
     // If we don't have a stored speed, set the speed to our configured default speed
     if (!storedSpeed) {
-      storedSpeed = cached_settings.defaultSpeed;
+      storedSpeed = cached_settings.rememberSpeed
+        ? cached_settings.lastSpeed
+        : 1.0;
     }
     // TODO setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
 
@@ -100,7 +104,9 @@ function defineVideoController() {
       storedSpeed = pageState.speeds[event.target.currentSrc];
       if (!storedSpeed) {
         log("Overwriting stored speed to 1.0 (rememberSpeed disabled)", 4);
-        storedSpeed = cached_settings.defaultSpeed;
+        storedSpeed = cached_settings.rememberSpeed
+          ? cached_settings.lastSpeed
+          : 1.0;
       }
       // TODO setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
 
@@ -152,9 +158,9 @@ function defineVideoController() {
     this.video.removeEventListener("play", this.handlePlay);
     this.video.removeEventListener("seek", this.handleSeek);
     delete this.video.vsc;
-    let idx = tc.mediaElements.indexOf(this.video);
+    let idx = pageState.mediaElements.indexOf(this.video);
     if (idx != -1) {
-      tc.mediaElements.splice(idx, 1);
+      pageState.mediaElements.splice(idx, 1);
     }
   };
 
@@ -162,6 +168,7 @@ function defineVideoController() {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
     const speed = this.video.playbackRate.toFixed(2);
+    // TODO this works, but is different from chromium upstream, and seems it shouldn't work, so watch it
     const top = "0px",
       left = "0px";
 
@@ -174,7 +181,7 @@ function defineVideoController() {
       wrapper.classList.add("vsc-nosource");
     }
 
-    if (tc.settings.startHidden) {
+    if (cached_settings.startHidden) {
       wrapper.classList.add("vsc-hidden");
     }
 
@@ -183,12 +190,12 @@ function defineVideoController() {
         <style>
           @import "${chrome.runtime.getURL("shadow.css")}";
           * {
-            font-size:${tc.settings.controllerSize};
+            font-size:${cached_settings.controllerSize}px;
           }
         </style>
 
         <div id="controller" style="top:${top}; left:${left}; opacity:${
-      tc.settings.controllerOpacity
+      cached_settings.controllerOpacity
     };">
           <span data-action="drag" class="draggable">${speed}</span>
           <span id="controls">
@@ -233,7 +240,7 @@ function defineVideoController() {
       .addEventListener("mousedown", (e) => e.stopPropagation(), false);
 
     this.speedIndicator = shadow.querySelector("span");
-    var fragment = document.createDocumentFragment();
+    let fragment = document.createDocumentFragment();
     fragment.appendChild(wrapper);
 
     let p = this.parent;
@@ -275,7 +282,7 @@ function escapeStringRegExp(str) {
 }
 
 function isBlacklisted() {
-  tc.settings.blacklist.split("\n").forEach((match) => {
+  cached_settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
     if (match.length == 0) {
       return;
@@ -299,18 +306,6 @@ function isBlacklisted() {
   return false;
 }
 
-var coolDown = false;
-function refreshCoolDown() {
-  log("Begin refreshCoolDown", 5);
-  if (coolDown) {
-    clearTimeout(coolDown);
-  }
-  coolDown = setTimeout(function () {
-    coolDown = false;
-  }, 1000);
-  log("End refreshCoolDown", 5);
-}
-
 function setupListener() {
   /**
    * This function is called whenever a video speed rate change occurs.
@@ -323,7 +318,7 @@ function setupListener() {
     // It's possible to get a rate change on a VIDEO/AUDIO that doesn't have
     // a video controller attached to it.  If we do, ignore it.
     if (!video.vsc) return;
-    var speedIndicator = video.vsc.speedIndicator;
+    let speedIndicator = video.vsc.speedIndicator;
     var src = video.currentSrc;
     var speed = Number(video.playbackRate.toFixed(2));
 
@@ -331,36 +326,33 @@ function setupListener() {
 
     log("Updating controller with new speed", 5);
     speedIndicator.textContent = speed.toFixed(2);
-    tc.settings.speeds[src] = speed;
+    pageState.speeds[src] = speed;
     log("Storing lastSpeed in settings for the rememberSpeed feature", 5);
-    tc.settings.lastSpeed = speed;
-    log("Syncing chrome settings for lastSpeed", 5);
-    chrome.storage.sync.set({ lastSpeed: speed }, function () {
-      log("Speed setting saved: " + speed, 5);
-    });
-    // show the controller for 1000ms if it's hidden.
+    if (cached_settings.rememberSpeed || cached_settings.forceVideospeed) {
+      cached_settings.lastSpeed = speed;
+      log("Syncing chrome settings for lastSpeed", 5);
+      chrome.storage.sync.set({ lastSpeed: speed }, function () {
+        log("Speed setting saved: " + speed, 5);
+      });
+    }
     runAction("blink", null, null);
   }
 
   document.addEventListener(
     "ratechange",
     function (event) {
-      if (coolDown) {
-        log("Speed event propagation blocked", 4);
-        event.stopImmediatePropagation();
-      }
-      var video = event.target;
+      let video = event.target;
 
       /**
        * If the last speed is forced, only update the speed based on events created by
        * video speed instead of all video speed change events.
        */
-      if (tc.settings.forceLastSavedSpeed) {
+      if (cached_settings.forceVideospeed) {
         if (event.detail && event.detail.origin === "videoSpeed") {
           video.playbackRate = event.detail.speed;
           updateSpeedFromEvent(video);
         } else {
-          video.playbackRate = tc.settings.lastSpeed;
+          video.playbackRate = cached_settings.lastSpeed;
         }
         event.stopImmediatePropagation();
       } else {
@@ -422,7 +414,7 @@ function getShadow(parent) {
 
 function initializeNow(document) {
   log("Begin initializeNow", 5);
-  if (!tc.settings.enabled) return;
+  if (!cached_settings.enabled) return;
   // enforce init-once due to redundant callers
   if (!document.body || document.body.classList.contains("vsc-initialized")) {
     return;
@@ -431,6 +423,7 @@ function initializeNow(document) {
     setupListener();
   } catch {
     // no operation
+    // TODO why?
   }
   document.body.classList.add("vsc-initialized");
   log("initializeNow: vsc-initialized added to document body", 5);
@@ -480,11 +473,12 @@ function initializeNow(document) {
         }
 
         // Ignore keydown event if typing in a page without VSC
-        if (!tc.mediaElements.length) {
+        if (!pageState.mediaElements.length) {
           return false;
         }
 
-        var item = tc.settings.keyBindings.find((item) => item.key === key);
+        // TODO make keybindings a map so we can make this O(1)
+        let item = cached_settings.keybindings.find((item) => item.key === key);
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {
@@ -499,7 +493,7 @@ function initializeNow(document) {
       true
     );
 
-    if (!tc.settings.scrollDisabled) {
+    if (!cached_settings.scrollDisabled) {
       doc.addEventListener(
         "wheel",
         (event) => {
@@ -523,7 +517,7 @@ function initializeNow(document) {
     }
     if (
       node.nodeName === "VIDEO" ||
-      (node.nodeName === "AUDIO" && tc.settings.audioBoolean)
+      (cached_settings.affectAudio && node.nodeName === "AUDIO")
     ) {
       if (added) {
         node.vsc = new pageState.videoController(node, parent);
@@ -584,7 +578,7 @@ function initializeNow(document) {
   });
 
   let mediaTags = null;
-  if (tc.settings.audioBoolean) {
+  if (cached_settings.affectAudio) {
     mediaTags = document.querySelectorAll("video,audio");
   } else {
     mediaTags = document.querySelectorAll("video");
@@ -654,7 +648,7 @@ function lockSpeed() {
 function setSpeed(video, speed) {
   log("setSpeed started: " + speed, 5);
   var speedvalue = speed.toFixed(2);
-  if (tc.settings.forceLastSavedSpeed) {
+  if (cached_settings.forceLastSavedSpeed) {
     video.dispatchEvent(
       new CustomEvent("ratechange", {
         detail: { origin: "videoSpeed", speed: speedvalue }
@@ -663,20 +657,19 @@ function setSpeed(video, speed) {
   } else {
     video.playbackRate = Number(speedvalue);
   }
-  var speedIndicator = video.vsc.speedIndicator;
+  let speedIndicator = video.vsc.speedIndicator;
   speedIndicator.textContent = speedvalue;
-  tc.settings.lastSpeed = speed;
-  refreshCoolDown();
+  cached_settings.lastSpeed = speed;
   log("setSpeed finished: " + speed, 5);
 }
 
 function runAction(action, value, e) {
   log("runAction Begin", 5);
 
-  tc.mediaElements.forEach(function (v) {
+  pageState.mediaElements.forEach(function (v) {
     const controller = v.vsc.div;
 
-    // Don't change video speed if the video has a different controller e exists
+    // Don't change video speed if the video has a different controller and e exists
     // Magnus says: I think this means it has a different iframe but not absolutely sure, and I think e means its from a button press but again unsure
     if (e && !(e.target.getRootNode().host == controller)) {
       return;
