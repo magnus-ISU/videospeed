@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelector("#about").addEventListener("click", function () {
-    window.open("https://github.com/codebicycle/videospeed");
+    window.open("https://github.com/magnus-ISU/videospeed");
   });
 
   document.querySelector("#feedback").addEventListener("click", function () {
-    window.open("https://github.com/codebicycle/videospeed/issues");
+    window.open("https://github.com/magnus-ISU/videospeed/issues");
   });
 
   document.querySelector("#enable").addEventListener("click", function () {
