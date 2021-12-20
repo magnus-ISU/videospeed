@@ -9,6 +9,7 @@ const tcDefaults = {
   audioBoolean: false,
   startHidden: false,
   forceLastSavedSpeed: false,
+  scrollDisabled: false,
   controllerOpacity: 0.3,
   controllerSize: "13px",
   keyBindings: [
@@ -42,6 +43,7 @@ var tc = {
     displayKey: tcDefaults.displayKey,
     rememberSpeed: tcDefaults.rememberSpeed,
     forceLastSavedSpeed: tcDefaults.forceLastSavedSpeed,
+    scrollDisabled: tcDefaults.scrollDisabled,
     audioBoolean: tcDefaults.audioBoolean,
     startHidden: tcDefaults.startHidden,
     controllerOpacity: tcDefaults.controllerOpacity,
@@ -124,6 +126,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
       forceLastSavedSpeed: tc.settings.forceLastSavedSpeed,
       audioBoolean: tc.settings.audioBoolean,
       startHidden: tc.settings.startHidden,
+      scrollDisabled: tc.settings.scrollDisabled,
       enabled: tc.settings.enabled,
       controllerOpacity: tc.settings.controllerOpacity,
       controllerSize: tc.settings.controllerSize,
@@ -137,6 +140,7 @@ chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.audioBoolean = Boolean(storage.audioBoolean);
   tc.settings.enabled = Boolean(storage.enabled);
   tc.settings.startHidden = Boolean(storage.startHidden);
+  tc.settings.scrollDisabled = Boolean(storage.scrollDisabled);
   tc.settings.controllerOpacity = Number(storage.controllerOpacity);
   tc.settings.controllerSize = String(storage.controllerSize);
   tc.settings.blacklist = String(storage.blacklist);
@@ -608,19 +612,21 @@ function initializeNow(document) {
       true
     );
 
-    doc.addEventListener(
-      "wheel",
-      (event) => {
-        if (!event.ctrlKey || !event.shiftKey) {
-          return;
-        }
-        event.preventDefault();
-        event.stopPropagation();
-        console.log(event.deltaY);
-        runAction("faster", event.deltaY * -0.001);
-      },
-      { passive: false }
-    );
+    if (!tc.settings.scrollDisabled) {
+      doc.addEventListener(
+        "wheel",
+        (event) => {
+          if (!event.ctrlKey || !event.shiftKey) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          console.log(event.deltaY);
+          runAction("faster", event.deltaY * -0.001);
+        },
+        { passive: false }
+      );
+    }
   });
 
   function checkForVideo(node, parent, added) {
@@ -719,10 +725,10 @@ function addSpeed(v, speed) {
   if (speed_locked) return;
   log("Changing speed", 5);
 
-  let orig_s = v.playbackRate < 0.1 ? 0.0 : v.playbackRate;
+  let orig_s = v.playbackRate <= MIN_SPEED ? 0.0 : v.playbackRate;
   let s = orig_s + speed;
   // Make sure no matter how small s is, we can increase it
-  if (s < 0.1) s = 0.1;
+  if (s < MIN_SPEED) s = MIN_SPEED;
   // Clamp to max and min
   s = Math.min(s, MAX_SPEED);
   s = Math.max(s, MIN_SPEED);

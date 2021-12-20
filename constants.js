@@ -13,6 +13,7 @@ export const tcDefaults = {
   audioBoolean: false,
   startHidden: false,
   forceLastSavedSpeed: false,
+  scrollDisabled: false,
   controllerOpacity: 0.3,
   controllerSize: "13px",
   keyBindings: [

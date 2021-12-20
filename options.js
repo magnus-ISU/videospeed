@@ -127,6 +127,7 @@ function save_options() {
     createKeyBindings(item)
   ); // Remove added shortcuts
 
+  // TODO Refactor this so that we define all options once in an array (or maybe object so type can be specified) and everything else is looped over
   let rememberSpeed = document.getElementById("rememberSpeed").checked;
   let forceLastSavedSpeed = document.getElementById(
     "forceLastSavedSpeed"
@@ -134,6 +135,7 @@ function save_options() {
   let audioBoolean = document.getElementById("audioBoolean").checked;
   let enabled = document.getElementById("enabled").checked;
   let startHidden = document.getElementById("startHidden").checked;
+  let scrollDisabled = document.getElementById("scrollDisabled").checked;
   let controllerOpacity = document.getElementById("controllerOpacity").value;
   let controllerSize = document.getElementById("controllerSize").value;
   let blacklist = document.getElementById("blacklist").value;
@@ -158,6 +160,7 @@ function save_options() {
       audioBoolean: audioBoolean,
       enabled: enabled,
       startHidden: startHidden,
+      scrollDisabled: scrollDisabled,
       controllerOpacity: controllerOpacity,
       controllerSize: controllerSize,
       keyBindings: keyBindings,
@@ -178,6 +181,7 @@ function restore_options() {
     document.getElementById("audioBoolean").checked = storage.audioBoolean;
     document.getElementById("enabled").checked = storage.enabled;
     document.getElementById("startHidden").checked = storage.startHidden;
+    document.getElementById("scrollDisabled").checked = storage.scrollDisabled;
     document.getElementById("controllerOpacity").value =
       storage.controllerOpacity;
     document.getElementById("controllerSize").value =
