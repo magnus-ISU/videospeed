@@ -52,17 +52,14 @@ chrome.storage.sync.get(cached_settings, (storage) => {
   initializeWhenReady(document);
 });
 
+// TODO put blacklist detection here
+
 function getKeyBindings(action, what = "value") {
   try {
-    return tc.settings.keyBindings.find((item) => item.action === action)[what];
+    return cached_settings.keybindings.find((item) => item.action === action)[what];
   } catch (e) {
     return false;
   }
-}
-
-function setKeyBindings(action, value) {
-  tc.settings.keyBindings.find((item) => item.action === action)["value"] =
-    value;
 }
 
 function defineVideoController() {
@@ -78,29 +75,21 @@ function defineVideoController() {
 
   // added to AUDIO / VIDEO DOM elements
   //    vsc = reference to the videoController
-  tc.videoController = function (target, parent) {
+  pageState.videoController = function (target, parent) {
     if (target.vsc) {
       return target.vsc;
     }
 
-    tc.mediaElements.push(target);
+    pageState.mediaElements.push(target);
 
     this.video = target;
     this.parent = target.parentElement || parent;
-    storedSpeed = tc.settings.speeds[target.currentSrc];
-    if (!tc.settings.rememberSpeed) {
-      if (!storedSpeed) {
-        log(
-          "Overwriting stored speed to 1.0 because rememberSpeed is disabled",
-          5
-        );
-        storedSpeed = 1.0;
-      }
-      setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
-    } else {
-      log("Recalling stored speed because rememberSpeed is enabled", 5);
-      storedSpeed = tc.settings.lastSpeed;
+    storedSpeed = pageState.speeds[target.currentSrc];
+    // If we don't have a stored speed, set the speed to our configured default speed
+    if (!storedSpeed) {
+      storedSpeed = cached_settings.defaultSpeed;
     }
+    // TODO setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
 
     log("Explicitly setting playbackRate to: " + storedSpeed, 5);
     target.playbackRate = storedSpeed;
@@ -108,28 +97,22 @@ function defineVideoController() {
     this.div = this.initializeControls();
 
     var mediaEventAction = function (event) {
-      storedSpeed = tc.settings.speeds[event.target.currentSrc];
-      if (!tc.settings.rememberSpeed) {
-        if (!storedSpeed) {
-          log("Overwriting stored speed to 1.0 (rememberSpeed disabled)", 4);
-          storedSpeed = 1.0;
-        }
-        // resetSpeed isn't really a reset, it's a toggle
-        log("Setting reset keybinding to fast", 5);
-        setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
-      } else {
-        log(
-          "Storing lastSpeed into tc.settings.speeds (rememberSpeed enabled)",
-          5
-        );
-        storedSpeed = tc.settings.lastSpeed;
+      storedSpeed = pageState.speeds[event.target.currentSrc];
+      if (!storedSpeed) {
+        log("Overwriting stored speed to 1.0 (rememberSpeed disabled)", 4);
+        storedSpeed = cached_settings.defaultSpeed;
       }
+      // TODO setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
+
+      log("Explicitly setting playbackRate to: " + storedSpeed, 4);
       // TODO: Check if explicitly setting the playback rate to 1.0 is
       // necessary when rememberSpeed is disabled (this may accidentally
       // override a website's intentional initial speed setting,
       // interfering with the site's default behavior)
-      log("Explicitly setting playbackRate to: " + storedSpeed, 4);
-      setSpeed(event.target, storedSpeed);
+      // Magnus addendum: by checking if it is not 1, I think we resolve this problem; if teh user has a default speed, it is used, but if not, we leave the website alone
+      if (storedSpeed != 1.0) {
+        setSpeed(event.target, storedSpeed);
+      }
     };
 
     target.addEventListener(
@@ -164,7 +147,7 @@ function defineVideoController() {
     });
   };
 
-  tc.videoController.prototype.remove = function () {
+  pageState.videoController.prototype.remove = function () {
     this.div.remove();
     this.video.removeEventListener("play", this.handlePlay);
     this.video.removeEventListener("seek", this.handleSeek);
@@ -175,7 +158,7 @@ function defineVideoController() {
     }
   };
 
-  tc.videoController.prototype.initializeControls = function () {
+  pageState.videoController.prototype.initializeControls = function () {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
     const speed = this.video.playbackRate.toFixed(2);
@@ -543,7 +526,7 @@ function initializeNow(document) {
       (node.nodeName === "AUDIO" && tc.settings.audioBoolean)
     ) {
       if (added) {
-        node.vsc = new tc.videoController(node, parent);
+        node.vsc = new pageState.videoController(node, parent);
       } else {
         if (node.vsc) {
           node.vsc.remove();
@@ -608,7 +591,7 @@ function initializeNow(document) {
   }
 
   mediaTags.forEach((video) => {
-    video.vsc = new tc.videoController(video);
+    video.vsc = new pageState.videoController(video);
   });
 
   var frameTags = document.getElementsByTagName("iframe");
@@ -781,7 +764,7 @@ function resetSpeed(v, target) {
     }
   } else {
     log('Toggling playback speed to "reset" speed', 4);
-    setKeyBindings("reset", v.playbackRate);
+    // TODO setKeyBindings("reset", v.playbackRate);
     setSpeed(v, target);
   }
 }

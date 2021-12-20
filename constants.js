@@ -17,10 +17,10 @@ export const settings = {
     default: false,
     description: "Remember playback speed"
   },
-  enforceDefaultSpeed: {
+  forceVideospeed: {
     type: "b",
     default: false,
-    description: "Enforce default speed"
+    description: "Don't allow websites to change video speed"
   },
   affectAudio: { type: "b", default: false, description: "Work on Audio" },
   scrollDisabled: {
