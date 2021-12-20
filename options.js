@@ -144,7 +144,6 @@ function save_options() {
       Array.from(document.querySelectorAll(".customs")).forEach((item) =>
         arr.push(createKeyBindings(item))
       );
-      console.log(arr);
       return arr;
     }
   });
@@ -200,6 +199,7 @@ function restore_options() {
 }
 
 function restore_defaults() {
+  chrome.storage.sync.clear();
   chrome.storage.sync.set(
     settings_defaults,
     () => {

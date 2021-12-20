@@ -47,14 +47,17 @@ var pageState = {
   mediaElements: []
 };
 var cached_settings = settings_defaults;
-// TODO listen to changes in chrome.settings.sync
+
+chrome.storage.onChanged.addListener((callback) => {
+  Object.keys(callback).forEach((key) => {
+    cached_settings[key] = callback[key].newValue;
+  });
+});
 
 chrome.storage.sync.get(cached_settings, (storage) => {
   cached_settings = storage;
   initializeWhenReady(document);
 });
-
-// TODO put blacklist detection here
 
 function getKeyBindings(action, what = "value") {
   try {
@@ -498,6 +501,9 @@ function initializeNow(document) {
       doc.addEventListener(
         "wheel",
         (event) => {
+          if (cached_settings.scrollDisabled) {
+            return;
+          }
           if (!event.ctrlKey || !event.shiftKey) {
             return;
           }
@@ -754,7 +760,7 @@ function resetSpeed(v, target) {
     if (reset_speed === target) {
       reset_speed = 1.0;
     }
-    log('Toggling playback speed back to ' + reset_speed, 4);
+    log("Toggling playback speed back to " + reset_speed, 4);
     setSpeed(v, reset_speed);
     reset_speed = target;
   } else {
