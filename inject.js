@@ -4,7 +4,6 @@ const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const tcDefaults = {
   enabled: true,
   speed: 1.0,
-  displayKey: "v",
   rememberSpeed: false,
   audioBoolean: false,
   startHidden: false,
@@ -28,6 +27,8 @@ imgur.com
 teams.microsoft.com
 `
 };
+
+//////////////////////// BEGIN INJECT.JS /////////////////////////
 // Chromium max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
 // Chromium min speed is 0.0625: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
 const MAX_SPEED = 16.0;
@@ -40,7 +41,6 @@ var tc = {
     enabled: true,
     lastSpeed: 1.0, // default 1x
 
-    displayKey: tcDefaults.displayKey,
     rememberSpeed: tcDefaults.rememberSpeed,
     forceLastSavedSpeed: tcDefaults.forceLastSavedSpeed,
     scrollDisabled: tcDefaults.scrollDisabled,
@@ -110,31 +110,14 @@ function storageToString(stored_key, default_key) {
 chrome.storage.sync.get(tc.settings, function (storage) {
   tc.settings.keyBindings = storage.keyBindings; // Array
 
-  // The first time the extension runs...
+  // If the keybindings array is empty, set it to the default. TODO fixme because shouldn't be necessary
   if (storage.keyBindings.length == 0) {
     tc.settings.keyBindings = tcDefaults.keyBindings;
-
-    // TODO what does this do?
-    tc.settings.version = "0.5.3";
-
-    // TODO we should refactor tc so we can just call chrome.storage.sync.set(tc.settings)
     chrome.storage.sync.set({
       keyBindings: tc.settings.keyBindings,
-      version: tc.settings.version,
-      displayKey: tc.settings.displayKey,
-      rememberSpeed: tc.settings.rememberSpeed,
-      forceLastSavedSpeed: tc.settings.forceLastSavedSpeed,
-      audioBoolean: tc.settings.audioBoolean,
-      startHidden: tc.settings.startHidden,
-      scrollDisabled: tc.settings.scrollDisabled,
-      enabled: tc.settings.enabled,
-      controllerOpacity: tc.settings.controllerOpacity,
-      controllerSize: tc.settings.controllerSize,
-      blacklist: tc.settings.blacklist.replace(regStrip, "")
     });
   }
   tc.settings.lastSpeed = Number(storage.lastSpeed);
-  tc.settings.displayKey = String(storage.displayKey);
   tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
   tc.settings.forceLastSavedSpeed = Boolean(storage.forceLastSavedSpeed);
   tc.settings.audioBoolean = Boolean(storage.audioBoolean);

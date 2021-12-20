@@ -4,18 +4,6 @@ export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 // The default values for each setting
 export const tcDefaults = {
-  enabled: true,
-  // The default speed videos should play with
-  speed: 1.0,
-  //TODO is this value used? I don't see why it should be needed, can probably be refactored out?
-  displayKey: "v",
-  rememberSpeed: false,
-  audioBoolean: false,
-  startHidden: false,
-  forceLastSavedSpeed: false,
-  scrollDisabled: false,
-  controllerOpacity: 0.3,
-  controllerSize: "13px",
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.25, force: false, predefined: true },
@@ -32,3 +20,50 @@ imgur.com
 teams.microsoft.com
 `
 };
+
+export const settings = {
+  // types are "b"oolean, "i"nt, "s"tring
+  enabled: { type: "b", default: true, description: "Enable" },
+  startHidden: {
+    type: "b",
+    default: false,
+    description: "Hide controller by default"
+  },
+  rememberSpeed: {
+    type: "b",
+    default: false,
+    description: "Remember playback speed"
+  },
+  enforceDefaultSpeed: {
+    type: "b",
+    default: false,
+    description: "Enforce default speed"
+  },
+  affectAudio: { type: "b", default: false, description: "Work on Audio" },
+  scrollDisabled: {
+    type: "b",
+    default: false,
+    description: "Disable Ctrl+Shift+Scroll"
+  },
+  controllerOpacity: {
+    type: "i",
+    default: 0.3,
+    description: "Controller Opacity"
+  },
+  controllerSize: {
+    type: "i",
+    default: 14,
+    description: "Controller Size (px)"
+  },
+  defaultSpeed: { type: "i", default: 1.0, description: "Default speed" }
+};
+
+// https://stackoverflow.com/questions/14810506/map-function-for-objects-instead-of-arrays
+export const objectMap = (obj, fn) =>
+  Object.fromEntries(
+    Object.entries(obj).map(
+      ([k, v], i) => [k, fn(v, k, i)]
+    )
+  );
+
+export const settings_defaults = objectMap(settings, (v) => v.default);
