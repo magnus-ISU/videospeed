@@ -47,11 +47,9 @@ var pageState = {
   mediaElements: []
 };
 var cached_settings = settings_defaults;
-console.log(cached_settings);
 // TODO listen to changes in chrome.settings.sync
 
 chrome.storage.sync.get(cached_settings, (storage) => {
-  console.log(storage);
   cached_settings = storage;
   initializeWhenReady(document);
 });
@@ -119,7 +117,6 @@ function defineVideoController() {
       // override a website's intentional initial speed setting,
       // interfering with the site's default behavior)
       // Magnus addendum: by checking if it is not 1, I think we resolve this problem; if teh user has a default speed, it is used, but if not, we leave the website alone
-      console.log(storedSpeed);
       if (storedSpeed != 1.0) {
         setSpeed(event.target, storedSpeed);
       }
@@ -744,23 +741,25 @@ function pause(v) {
   }
 }
 
+var reset_speed;
 function resetSpeed(v, target) {
   if (v.playbackRate === target) {
-    if (v.playbackRate === getKeyBindings("reset")) {
-      if (target !== 1.0) {
-        log("Resetting playback speed to 1.0", 4);
-        setSpeed(v, 1.0);
-      } else {
-        log('Toggling playback speed to "fast" speed', 4);
-        setSpeed(v, getKeyBindings("fast"));
-      }
-    } else {
-      log('Toggling playback speed to "reset" speed', 4);
-      setSpeed(v, getKeyBindings("reset"));
+    // Get the other value we will toggle to
+    if (reset_speed === undefined) {
+      reset_speed = getKeyBindings("fast");
+    } else if (reset_speed === target) {
+      reset_speed = getKeyBindings("fast");
     }
+    // if we are still equal to the target, our cache was the fast speed, so set it to 1
+    if (reset_speed === target) {
+      reset_speed = 1.0;
+    }
+    log('Toggling playback speed back to ' + reset_speed, 4);
+    setSpeed(v, reset_speed);
+    reset_speed = target;
   } else {
     log('Toggling playback speed to "reset" speed', 4);
-    // TODO setKeyBindings("reset", v.playbackRate);
+    reset_speed = v.playbackRate;
     setSpeed(v, target);
   }
 }
