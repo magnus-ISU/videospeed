@@ -154,12 +154,10 @@ function restore_options() {
       } else if (settings[key].type === "s" || settings[key].type === "i") {
         document.getElementById(key).value = storage[key];
       } else if (settings[key].type === "keybindings") {
-        for (let i in storage.keyBindings) {
-          let item = storage.keyBindings[i];
+        for (let item of storage[key]) {
+          // do predefined ones because their value needed for overlay
+          // TODO the comment implies there is a reason to seperate this functionality but I don't see it, investigate later
           if (item.predefined) {
-            //do predefined ones because their value needed for overlay
-            //TOOD I'm not sure what this means
-
             if (customActionsNoValues.includes(item["action"]))
               document.querySelector(
                 "#" + item["action"] + " .customValue"
@@ -220,7 +218,7 @@ function addSettingsToDOM() {
 }
 function addSettingToDOM(s) {
   if (settings[s].html) {
-    document.getElementById("settings").innerHTML += html;
+    document.getElementById("settings").innerHTML += settings[s].html;
   } else if (settings[s].description) {
     document.getElementById("settings").innerHTML += `\
 <div class="row">
