@@ -35,21 +35,15 @@ var tc = {
     enabled: true,
     speeds: {}, // empty object to hold speed for each source
 
-    displayKey: "v",
-    rememberSpeed: false,
-    forceLastSavedSpeed: false,
-    audioBoolean: false,
-    startHidden: false,
-    controllerOpacity: 0.3,
-    controllerSize: "13px",
+    displayKey: tcDefaults.displayKey,
+    rememberSpeed: tcDefaults.rememberSpeed,
+    forceLastSavedSpeed: tcDefaults.forceLastSavedSpeed,
+    audioBoolean: tcDefaults.audioBoolean,
+    startHidden: tcDefaults.startHidden,
+    controllerOpacity: tcDefaults.controllerOpacity,
+    controllerSize: tcDefaults.controllerSize,
     keyBindings: [],
-    blacklist: `\
-www.instagram.com
-twitter.com
-imgur.com
-teams.microsoft.com
-`,
-    defaultLogLevel: 4,
+    blacklist: tcDefaults.blacklist,
     logLevel: 3
   },
 
@@ -240,7 +234,7 @@ function defineVideoController() {
             mutation.attributeName === "currentSrc")
         ) {
           log("mutation of A/V element", 5);
-          var controller = this.div;
+          let controller = this.div;
           if (!mutation.target.src && !mutation.target.currentSrc) {
             controller.classList.add("vsc-nosource");
           } else {
@@ -269,7 +263,8 @@ function defineVideoController() {
     log("initializeControls Begin", 5);
     const document = this.video.ownerDocument;
     const speed = this.video.playbackRate.toFixed(2);
-    const top = "0px", left = "0px";
+    const top = "0px",
+      left = "0px";
 
     log("Speed variable set to: " + speed, 5);
 
@@ -355,8 +350,9 @@ function defineVideoController() {
         // this is a monstrosity but new FB design does not have *any*
         // semantic handles for us to traverse the tree, and deep nesting
         // that we need to bubble up from to get controller to stack correctly
-        p = p.parentElement.parentElement.parentElement
-          .parentElement.parentElement.parentElement.parentElement;
+        p =
+          p.parentElement.parentElement.parentElement.parentElement
+            .parentElement.parentElement.parentElement;
         break;
       case location.hostname === "www.netflix.com":
         p = p.parentElement.parentElement.parentElement;
@@ -365,11 +361,11 @@ function defineVideoController() {
         // insert after parent for correct stacking context
         p.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
-        // Note: when triggered via a MutationRecord, it's possible that the
-        // target is not the immediate parent. This appends the controller as
-        // the first element of the target, which may not be the parent.
+      // Note: when triggered via a MutationRecord, it's possible that the
+      // target is not the immediate parent. This appends the controller as
+      // the first element of the target, which may not be the parent.
     }
-    p.insertBefore(fragment,p.firstChild);
+    p.insertBefore(fragment, p.firstChild);
     return wrapper;
   };
 }
@@ -554,10 +550,10 @@ function initializeNow(document) {
     if (inIframe()) docs.push(window.top.document);
   } catch (e) {}
 
-  docs.forEach(function (doc) {
+  docs.forEach((doc) => {
     doc.addEventListener(
       "keydown",
-      function (event) {
+      (event) => {
         let key = event.key;
         log("Processing keydown event: " + key, 6);
 
@@ -602,6 +598,19 @@ function initializeNow(document) {
         return false;
       },
       true
+    );
+
+    doc.addEventListener(
+      "wheel",
+      (event) => {
+        if (!event.ctrlKey || !event.shiftKey) {
+          return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        console.log(event);
+      },
+      {passive: false}
     );
   });
 
@@ -672,13 +681,14 @@ function initializeNow(document) {
     subtree: true
   });
 
+  let mediaTags = null;
   if (tc.settings.audioBoolean) {
-    var mediaTags = document.querySelectorAll("video,audio");
+    mediaTags = document.querySelectorAll("video,audio");
   } else {
-    var mediaTags = document.querySelectorAll("video");
+    mediaTags = document.querySelectorAll("video");
   }
 
-  mediaTags.forEach(function (video) {
+  mediaTags.forEach((video) => {
     video.vsc = new tc.videoController(video);
   });
 
@@ -693,6 +703,17 @@ function initializeNow(document) {
     initializeWhenReady(childDocument);
   });
   log("End initializeNow", 5);
+}
+
+function addSpeed(v, speed) {
+  log("Changing speed", 5);
+  let s = v.playbackRate < 0.1 ? 0.0 : v.playbackRate;
+  s += speed;
+  // Chrome max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
+  s = Math.min(s, 16);
+  // Chrome min speed is 0.0625: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
+  s = Math.max(s, 0.07);
+  setSpeed(v, s);
 }
 
 function setSpeed(video, speed) {
@@ -717,23 +738,18 @@ function setSpeed(video, speed) {
 function runAction(action, value, e) {
   log("runAction Begin", 5);
 
-  var mediaTags = tc.mediaElements;
+  tc.mediaElements.forEach(function (v) {
+    const controller = v.vsc.div;
 
-  // Get the controller that was used if called from a button press event e
-  if (e) {
-    var targetController = e.target.getRootNode().host;
-  }
-
-  mediaTags.forEach(function (v) {
-    var controller = v.vsc.div;
-
-    // Don't change video speed if the video has a different controller
-    if (e && !(targetController == controller)) {
+    // Don't change video speed if the video has a different controller e exists
+    // Magnus says: I think this means it has a different iframe but not absolutely sure, and I think e means its from a button press but again unsure
+    if (e && !(e.target.getRootNode().host == controller)) {
       return;
     }
 
     showController(controller);
 
+    // TODO Refactor action into a function pointer and just call the function
     if (!v.classList.contains("vsc-cancelled")) {
       if (action === "rewind") {
         log("Rewind", 5);
@@ -742,20 +758,9 @@ function runAction(action, value, e) {
         log("Fast forward", 5);
         v.currentTime += value;
       } else if (action === "faster") {
-        log("Increase speed", 5);
-        // Maximum playback speed in Chrome is set to 16:
-        // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-        const s = Math.min(
-          (v.playbackRate < 0.1 ? 0.0 : v.playbackRate) + value,
-          16
-        );
-        setSpeed(v, s);
+        addSpeed(v, value)
       } else if (action === "slower") {
-        log("Decrease speed", 5);
-        // Video min rate is 0.0625:
-        // https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-        const s = Math.max(v.playbackRate - value, 0.07);
-        setSpeed(v, s);
+        addSpeed(v, -value);
       } else if (action === "reset") {
         log("Reset speed", 5);
         resetSpeed(v, 1.0);
