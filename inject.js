@@ -27,6 +27,11 @@ imgur.com
 teams.microsoft.com
 `
 };
+// Chromium max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
+// Chromium min speed is 0.0625: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
+const MAX_SPEED = 16.0;
+const MIN_SPEED = 0.07;
+const AUDIBLE_SPEED = 4.0;
 
 // TODO parts of this this may be able to be refactored out by using tcDefaults
 var tc = {
@@ -82,7 +87,9 @@ function log(message, level) {
         console.trace();
         break;
       default:
-        console.log("ALERT: Please report on GitHub how you got this to VideoSpeed");
+        console.log(
+          "ALERT: Please report on GitHub how you got this to VideoSpeed"
+        );
         console.trace();
     }
     console.log(to_print + message);
@@ -362,9 +369,9 @@ function defineVideoController() {
         // insert after parent for correct stacking context
         p.getRootNode().querySelector(".scrim").prepend(fragment);
       default:
-        // Note: When triggered via a MutationRecord, it's possible that the
-        // target is not the immediate parent. This appends the controller as
-        // the first element of the target, which may not be the parent.
+      // Note: When triggered via a MutationRecord, it's possible that the
+      // target is not the immediate parent. This appends the controller as
+      // the first element of the target, which may not be the parent.
     }
     p.insertBefore(fragment, p.firstChild);
     return wrapper;
@@ -609,9 +616,10 @@ function initializeNow(document) {
         }
         event.preventDefault();
         event.stopPropagation();
-        console.log(event);
+        console.log(event.deltaY);
+        runAction("faster", event.deltaY * -0.001);
       },
-      {passive: false}
+      { passive: false }
     );
   });
 
@@ -706,15 +714,48 @@ function initializeNow(document) {
   log("End initializeNow", 5);
 }
 
+var speed_locked = false;
 function addSpeed(v, speed) {
+  if (speed_locked) return;
   log("Changing speed", 5);
-  let s = v.playbackRate < 0.1 ? 0.0 : v.playbackRate;
-  s += speed;
-  // Chrome max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
-  s = Math.min(s, 16);
-  // Chrome min speed is 0.0625: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=165
-  s = Math.max(s, 0.07);
+
+  let orig_s = v.playbackRate < 0.1 ? 0.0 : v.playbackRate;
+  let s = orig_s + speed;
+  // Make sure no matter how small s is, we can increase it
+  if (s < 0.1) s = 0.1;
+  // Clamp to max and min
+  s = Math.min(s, MAX_SPEED);
+  s = Math.max(s, MIN_SPEED);
+
+  // If speed ends up within 0.9 to 1.1, predict the user wants to set it to 1 and clamp to that. Then disable changing speed for a quarter-second.
+  // But only if the user is moving towards 1
+  if (s < 1.0 && s > 0.9) {
+    if (orig_s < s) {
+      lockSpeed();
+      s = 1.0;
+    }
+  } else if (s > 1.0 && s < 1.1) {
+    if (orig_s > s) {
+      lockSpeed();
+      s = 1.0;
+    }
+  } else if (s < AUDIBLE_SPEED && s > AUDIBLE_SPEED - 0.1) {
+    // Same, but for speeds moving up to max audio (and not down from it)
+    if (orig_s < s) {
+      lockSpeed();
+      s = AUDIBLE_SPEED;
+    }
+  }
+
   setSpeed(v, s);
+}
+// Helper functions to run
+function unlockSpeed() {
+  speed_locked = false;
+}
+function lockSpeed() {
+  setTimeout(unlockSpeed, 250);
+  speed_locked = true;
 }
 
 function setSpeed(video, speed) {
@@ -759,7 +800,7 @@ function runAction(action, value, e) {
         log("Fast forward", 5);
         v.currentTime += value;
       } else if (action === "faster") {
-        addSpeed(v, value)
+        addSpeed(v, value);
       } else if (action === "slower") {
         addSpeed(v, -value);
       } else if (action === "reset") {
