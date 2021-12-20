@@ -2,15 +2,6 @@
 //import {regStrip, tcDefaults} from "./constants.js";
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const tcDefaults = {
-  enabled: true,
-  speed: 1.0,
-  rememberSpeed: false,
-  audioBoolean: false,
-  startHidden: false,
-  forceLastSavedSpeed: false,
-  scrollDisabled: false,
-  controllerOpacity: 0.3,
-  controllerSize: "13px",
   keyBindings: [
     { action: "display", key: "v", value: 0, force: false, predefined: true },
     { action: "slower", key: "s", value: 0.25, force: false, predefined: true },
@@ -19,14 +10,47 @@ const tcDefaults = {
     { action: "advance", key: "x", value: 10, force: false, predefined: true },
     { action: "reset", key: "r", value: 1, force: false, predefined: true },
     { action: "fast", key: "g", value: 2.5, force: false, predefined: true }
-  ],
-  blacklist: `\
-www.instagram.com
-twitter.com
-imgur.com
-teams.microsoft.com
-`
+  ]
 };
+const settings = {
+  // types are "b"oolean, "i"nt, "s"tring
+  enabled: { type: "b", default: true, description: "Enable" },
+  startHidden: {
+    type: "b",
+    default: false,
+    description: "Hide controller by default"
+  },
+  rememberSpeed: {
+    type: "b",
+    default: false,
+    description: "Remember playback speed"
+  },
+  enforceDefaultSpeed: {
+    type: "b",
+    default: false,
+    description: "Enforce default speed"
+  },
+  affectAudio: { type: "b", default: false, description: "Work on Audio" },
+  scrollDisabled: {
+    type: "b",
+    default: false,
+    description: "Disable Ctrl+Shift+Scroll"
+  },
+  controllerOpacity: {
+    type: "i",
+    default: 0.3,
+    description: "Controller Opacity"
+  },
+  controllerSize: {
+    type: "i",
+    default: 14,
+    description: "Controller Size (px)"
+  },
+  defaultSpeed: { type: "i", default: 1.0, description: "Default speed" }
+};
+const objectMap = (obj, fn) =>
+  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
+const settings_defaults = objectMap(settings, (v) => v.default);
 
 //////////////////////// BEGIN INJECT.JS /////////////////////////
 // Chromium max speed is 16: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/media/html_media_element.cc?gsn=kMinRate&l=166
@@ -35,70 +59,18 @@ const MAX_SPEED = 16.0;
 const MIN_SPEED = 0.07;
 const AUDIBLE_SPEED = 4.0;
 
-// TODO parts of this this may be able to be refactored out by using tcDefaults
-var tc = {
-  settings: {
-    enabled: true,
-    lastSpeed: 1.0, // default 1x
-
-    rememberSpeed: tcDefaults.rememberSpeed,
-    forceLastSavedSpeed: tcDefaults.forceLastSavedSpeed,
-    scrollDisabled: tcDefaults.scrollDisabled,
-    audioBoolean: tcDefaults.audioBoolean,
-    startHidden: tcDefaults.startHidden,
-    controllerOpacity: tcDefaults.controllerOpacity,
-    controllerSize: tcDefaults.controllerSize,
-    blacklist: tcDefaults.blacklist,
-
-    keyBindings: [],
-    speeds: {}, // empty object to hold speed for each source
-    logLevel: 3
-  },
-
+var pageState = {
+  // Keybindings (this should be in settings, TODO refactor)
+  keyBindings: [],
+  // Holds speed for each source
+  speeds: {},
   // Holds a reference to all of the AUDIO/VIDEO DOM elements we've attached to
   mediaElements: []
 };
+var cached_settings = settings_defaults;
+// TODO listen to changes in chrome.settings.sync
 
-/* Log levels (depends on caller specifying the correct level)
-  1 - none
-  2 - error
-  3 - warning
-  4 - info
-  5 - debug
-  6 - debug high verbosity + stack trace on each message
-*/
-function log(message, level) {
-  verbosity = tc.settings.logLevel;
-  let to_print = "";
-  if (verbosity >= level) {
-    switch (level) {
-      case 2:
-        to_print = "ERROR: ";
-        break;
-      case 3:
-        to_print = "WARNING: ";
-        break;
-      case 4:
-        to_print = "INFO: ";
-        break;
-      case 5:
-        to_print = "DEBUG: ";
-        break;
-      case 6:
-        to_print = "VERBOSE DEBUG: ";
-        console.trace();
-        break;
-      default:
-        console.log(
-          "ALERT: Please report on GitHub how you got this to VideoSpeed"
-        );
-        console.trace();
-    }
-    console.log(to_print + message);
-  }
-}
-
-// Needed because you cannot || with "undefined". Only used in the next lambda function
+// Needed because you cannot || with "undefined". Only used in the next lambda function when getting keybindings
 function storageToString(stored_key, default_key) {
   if (stored_key) {
     return String(stored_key);
@@ -107,29 +79,30 @@ function storageToString(stored_key, default_key) {
   }
 }
 
-chrome.storage.sync.get(tc.settings, function (storage) {
-  tc.settings.keyBindings = storage.keyBindings; // Array
+chrome.storage.sync.get(
+  Object.assign({}, cached_settings, tcDefaults),
+  (storage) => {
+    cached_settings = storage;
+    tc.settings.keyBindings = storage.keyBindings; // Array
 
-  // If the keybindings array is empty, set it to the default. TODO fixme because shouldn't be necessary
-  if (storage.keyBindings.length == 0) {
-    tc.settings.keyBindings = tcDefaults.keyBindings;
-    chrome.storage.sync.set({
-      keyBindings: tc.settings.keyBindings,
-    });
+    // If the keybindings array is empty, set it to the default. TODO fixme because shouldn't be necessary
+    if (storage.keyBindings.length == 0) {
+      pageState.keyBindings = tcDefaults.keyBindings;
+    }
+    tc.settings.lastSpeed = Number(storage.lastSpeed);
+    tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
+    tc.settings.forceLastSavedSpeed = Boolean(storage.forceLastSavedSpeed);
+    tc.settings.audioBoolean = Boolean(storage.audioBoolean);
+    tc.settings.enabled = Boolean(storage.enabled);
+    tc.settings.startHidden = Boolean(storage.startHidden);
+    tc.settings.scrollDisabled = Boolean(storage.scrollDisabled);
+    tc.settings.controllerOpacity = Number(storage.controllerOpacity);
+    tc.settings.controllerSize = String(storage.controllerSize);
+    tc.settings.blacklist = String(storage.blacklist);
+
+    initializeWhenReady(document);
   }
-  tc.settings.lastSpeed = Number(storage.lastSpeed);
-  tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
-  tc.settings.forceLastSavedSpeed = Boolean(storage.forceLastSavedSpeed);
-  tc.settings.audioBoolean = Boolean(storage.audioBoolean);
-  tc.settings.enabled = Boolean(storage.enabled);
-  tc.settings.startHidden = Boolean(storage.startHidden);
-  tc.settings.scrollDisabled = Boolean(storage.scrollDisabled);
-  tc.settings.controllerOpacity = Number(storage.controllerOpacity);
-  tc.settings.controllerSize = String(storage.controllerSize);
-  tc.settings.blacklist = String(storage.blacklist);
-
-  initializeWhenReady(document);
-});
+);
 
 function getKeyBindings(action, what = "value") {
   try {
@@ -938,4 +911,42 @@ function showController(controller) {
     timer = false;
     log("Hiding controller", 5);
   }, 2000);
+}
+
+/* Log levels (depends on caller specifying the correct level)
+  2 - error
+  3 - warning
+  4 - info
+  5 - debug
+  6 - debug high verbosity + stack trace on each message
+*/
+function log(message, level) {
+  if (3 < level) {
+    return;
+  }
+  let to_print = "";
+  switch (level) {
+    case 2:
+      to_print = "ERROR: ";
+      break;
+    case 3:
+      to_print = "WARNING: ";
+      break;
+    case 4:
+      to_print = "INFO: ";
+      break;
+    case 5:
+      to_print = "DEBUG: ";
+      break;
+    case 6:
+      to_print = "VERBOSE DEBUG: ";
+      console.trace();
+      break;
+    default:
+      console.log(
+        "ALERT: Please report on GitHub how you got this to VideoSpeed"
+      );
+      console.trace();
+  }
+  console.log(to_print + message);
 }

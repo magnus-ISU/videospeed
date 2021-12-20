@@ -1,6 +1,5 @@
 import {
   regStrip,
-  tcDefaults,
   settings,
   settings_defaults,
   objectMap
@@ -129,22 +128,18 @@ function save_options() {
   if (!validate_blacklist()) {
     return;
   }
-  chrome.storage.sync.set({
-    blacklist: document.getElementById("blacklist").value
-  });
-
-  keyBindings = [];
-  Array.from(document.querySelectorAll(".customs")).forEach((item) =>
-    createKeyBindings(item)
-  ); // Remove added shortcuts
 
   let settings_values = objectMap(settings, (v, k) => {
     if (v.type === "b") {
       return document.getElementById(k).checked;
     } else if (v.type === "i") {
       return Number.parseFloat(document.getElementById(k).value);
-    } else {
+    } else if (v.type === "s") {
       return document.getElementById(k).value;
+    } else if (v.type === "keybindings") {
+      return Array.from(document.querySelectorAll(".customs")).forEach((item) =>
+        createKeyBindings(item)
+      );
     }
   });
   chrome.storage.sync.set(settings_values, () => updateStatus("Options saved"));
@@ -156,55 +151,53 @@ function restore_options() {
     Object.keys(storage).forEach((key) => {
       if (settings[key].type === "b") {
         document.getElementById(key).checked = storage[key];
-      } else {
+      } else if (settings[key].type === "s" || settings[key].type === "i") {
         document.getElementById(key).value = storage[key];
+      } else if (settings[key].type === "keybindings") {
+        for (let i in storage.keyBindings) {
+          let item = storage.keyBindings[i];
+          if (item.predefined) {
+            //do predefined ones because their value needed for overlay
+            //TOOD I'm not sure what this means
+
+            if (customActionsNoValues.includes(item["action"]))
+              document.querySelector(
+                "#" + item["action"] + " .customValue"
+              ).disabled = true;
+
+            updateCustomShortcutInputText(
+              document.querySelector("#" + item["action"] + " .customKey"),
+              item["key"]
+            );
+            document.querySelector("#" + item["action"] + " .customValue").value =
+              item["value"];
+            document.querySelector("#" + item["action"] + " .customForce").value =
+              item["force"];
+          } else {
+            // new ones
+            add_shortcut();
+            const dom = document.querySelector(".customs:last-of-type");
+            dom.querySelector(".customDo").value = item["action"];
+
+            if (customActionsNoValues.includes(item["action"]))
+              dom.querySelector(".customValue").disabled = true;
+
+            updateCustomShortcutInputText(
+              dom.querySelector(".customKey"),
+              item["key"]
+            );
+            dom.querySelector(".customValue").value = item["value"];
+            dom.querySelector(".customForce").value = item["force"];
+          }
+        }
       }
-    });
-  });
-  chrome.storage.sync.get(tcDefaults, (storage) => {
-    document.getElementById("blacklist").value = storage.blacklist;
-    for (let i in storage.keyBindings) {
-      var item = storage.keyBindings[i];
-      if (item.predefined) {
-        //do predefined ones because their value needed for overlay
-        //TOOD I'm not sure what this means
-
-        if (customActionsNoValues.includes(item["action"]))
-          document.querySelector(
-            "#" + item["action"] + " .customValue"
-          ).disabled = true;
-
-        updateCustomShortcutInputText(
-          document.querySelector("#" + item["action"] + " .customKey"),
-          item["key"]
-        );
-        document.querySelector("#" + item["action"] + " .customValue").value =
-          item["value"];
-        document.querySelector("#" + item["action"] + " .customForce").value =
-          item["force"];
-      } else {
-        // new ones
-        add_shortcut();
-        const dom = document.querySelector(".customs:last-of-type");
-        dom.querySelector(".customDo").value = item["action"];
-
-        if (customActionsNoValues.includes(item["action"]))
-          dom.querySelector(".customValue").disabled = true;
-
-        updateCustomShortcutInputText(
-          dom.querySelector(".customKey"),
-          item["key"]
-        );
-        dom.querySelector(".customValue").value = item["value"];
-        dom.querySelector(".customForce").value = item["force"];
-      }
-    }
+      });
   });
 }
 
 function restore_defaults() {
   chrome.storage.sync.set(
-    Object.assign({}, tcDefaults, settings_defaults),
+    settings_defaults,
     () => {
       restore_options();
       // Remove buttons for non-default keybinds
@@ -226,13 +219,16 @@ function addSettingsToDOM() {
   Object.keys(settings).forEach(addSettingToDOM);
 }
 function addSettingToDOM(s) {
-  let html = `\
+  if (settings[s].html) {
+    document.getElementById("settings").innerHTML += html;
+  } else if (settings[s].description) {
+    document.getElementById("settings").innerHTML += `\
 <div class="row">
   <label for="${s}">${settings[s].description}</label>
   <input id="${s}" type="${settings[s].type === "b" ? "checkbox" : "text"}" />
 </div>
 `;
-  document.getElementById("settings").innerHTML += html;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
