@@ -1,4 +1,9 @@
-import { regStrip, tcDefaults } from "./constants.js";
+import {
+  regStrip,
+  settings,
+  settings_defaults,
+  objectMap
+} from "./constants.js";
 
 var keyBindings = [];
 
@@ -80,6 +85,7 @@ function add_shortcut() {
   );
 }
 
+// Takes in a div of a keybinding in the options document and returns a object with its info
 function createKeyBindings(item) {
   const action = item.querySelector(".customDo").value;
   const key = item.querySelector(".customKey").key;
@@ -87,17 +93,18 @@ function createKeyBindings(item) {
   const force = item.querySelector(".customForce").value;
   const predefined = !!item.id; //item.id ? true : false;
 
-  keyBindings.push({
+  return {
     action: action,
     key: key,
     value: value,
     force: force,
     predefined: predefined
-  });
+  };
 }
 
-// Validates settings before saving
-function validate() {
+// Validates blacklist before saving
+// TODO this function is hot garbage
+function validate_blacklist() {
   let status = document.getElementById("status");
   document
     .getElementById("blacklist")
@@ -119,125 +126,91 @@ function validate() {
 
 // Saves options to chrome.storage
 function save_options() {
-  if (validate() === false) {
+  if (!validate_blacklist()) {
     return;
   }
-  keyBindings = [];
-  Array.from(document.querySelectorAll(".customs")).forEach((item) =>
-    createKeyBindings(item)
-  ); // Remove added shortcuts
 
-  // TODO Refactor this so that we define all options once in an array (or maybe object so type can be specified) and everything else is looped over
-  let rememberSpeed = document.getElementById("rememberSpeed").checked;
-  let forceLastSavedSpeed = document.getElementById(
-    "forceLastSavedSpeed"
-  ).checked;
-  let audioBoolean = document.getElementById("audioBoolean").checked;
-  let enabled = document.getElementById("enabled").checked;
-  let startHidden = document.getElementById("startHidden").checked;
-  let scrollDisabled = document.getElementById("scrollDisabled").checked;
-  let controllerOpacity = document.getElementById("controllerOpacity").value;
-  let controllerSize = document.getElementById("controllerSize").value;
-  let blacklist = document.getElementById("blacklist").value;
-
-  chrome.storage.sync.remove([
-    "resetSpeed",
-    "speedStep",
-    "fastSpeed",
-    "rewindTime",
-    "advanceTime",
-    "resetKey",
-    "slowerKey",
-    "fasterKey",
-    "rewindKey",
-    "advanceKey",
-    "fastKey"
-  ]);
-  chrome.storage.sync.set(
-    {
-      rememberSpeed: rememberSpeed,
-      forceLastSavedSpeed: forceLastSavedSpeed,
-      audioBoolean: audioBoolean,
-      enabled: enabled,
-      startHidden: startHidden,
-      scrollDisabled: scrollDisabled,
-      controllerOpacity: controllerOpacity,
-      controllerSize: controllerSize,
-      keyBindings: keyBindings,
-      blacklist: blacklist
-    },
-    function () {
-      updateStatus("Options saved");
+  let settings_values = objectMap(settings, (v, k) => {
+    if (v.type === "b") {
+      return document.getElementById(k).checked;
+    } else if (v.type === "i") {
+      return Number.parseFloat(document.getElementById(k).value);
+    } else if (v.type === "s") {
+      return document.getElementById(k).value;
+    } else if (v.type === "d") {
+      return v.default;
+    } else if (v.type === "keybindings") {
+      let arr = [];
+      Array.from(document.querySelectorAll(".customs")).forEach((item) =>
+        arr.push(createKeyBindings(item))
+      );
+      return arr;
     }
-  );
+  });
+  chrome.storage.sync.set(settings_values, () => updateStatus("Options saved"));
 }
 
-// Restores options from chrome.storage
+// Takes values from chrome.storage and inserts them into the document
 function restore_options() {
-  chrome.storage.sync.get(tcDefaults, function (storage) {
-    document.getElementById("rememberSpeed").checked = storage.rememberSpeed;
-    document.getElementById("forceLastSavedSpeed").checked =
-      storage.forceLastSavedSpeed;
-    document.getElementById("audioBoolean").checked = storage.audioBoolean;
-    document.getElementById("enabled").checked = storage.enabled;
-    document.getElementById("startHidden").checked = storage.startHidden;
-    document.getElementById("scrollDisabled").checked = storage.scrollDisabled;
-    document.getElementById("controllerOpacity").value =
-      storage.controllerOpacity;
-    document.getElementById("controllerSize").value =
-      storage.controllerSize;
-    document.getElementById("blacklist").value = storage.blacklist;
+  chrome.storage.sync.get(settings_defaults, (storage) => {
+    Object.keys(storage).forEach((key) => {
+      if (settings[key].type === "b") {
+        document.getElementById(key).checked = storage[key];
+      } else if (settings[key].type === "s" || settings[key].type === "i") {
+        document.getElementById(key).value = storage[key];
+      } else if (settings[key].type === "keybindings") {
+        for (let item of storage[key]) {
+          // do predefined ones because their value needed for overlay
+          // TODO the comment implies there is a reason to seperate this functionality but I don't see it, investigate later
+          if (item.predefined) {
+            if (customActionsNoValues.includes(item["action"]))
+              document.querySelector(
+                "#" + item["action"] + " .customValue"
+              ).disabled = true;
 
-    for (let i in storage.keyBindings) {
-      var item = storage.keyBindings[i];
-      if (item.predefined) {
-        //do predefined ones because their value needed for overlay
-        // document.querySelector("#" + item["action"] + " .customDo").value = item["action"];
-        if (item["action"] == "display" && typeof item["key"] === "undefined") {
-          item["key"] = storage.displayKey || tcDefaults.displayKey;
+            updateCustomShortcutInputText(
+              document.querySelector("#" + item["action"] + " .customKey"),
+              item["key"]
+            );
+            document.querySelector("#" + item["action"] + " .customValue").value =
+              item["value"];
+            document.querySelector("#" + item["action"] + " .customForce").value =
+              item["force"];
+          } else {
+            // new ones
+            add_shortcut();
+            const dom = document.querySelector(".customs:last-of-type");
+            dom.querySelector(".customDo").value = item["action"];
+
+            if (customActionsNoValues.includes(item["action"]))
+              dom.querySelector(".customValue").disabled = true;
+
+            updateCustomShortcutInputText(
+              dom.querySelector(".customKey"),
+              item["key"]
+            );
+            dom.querySelector(".customValue").value = item["value"];
+            dom.querySelector(".customForce").value = item["force"];
+          }
         }
-
-        if (customActionsNoValues.includes(item["action"]))
-          document.querySelector(
-            "#" + item["action"] + " .customValue"
-          ).disabled = true;
-
-        updateCustomShortcutInputText(
-          document.querySelector("#" + item["action"] + " .customKey"),
-          item["key"]
-        );
-        document.querySelector("#" + item["action"] + " .customValue").value =
-          item["value"];
-        document.querySelector("#" + item["action"] + " .customForce").value =
-          item["force"];
-      } else {
-        // new ones
-        add_shortcut();
-        const dom = document.querySelector(".customs:last-of-type");
-        dom.querySelector(".customDo").value = item["action"];
-
-        if (customActionsNoValues.includes(item["action"]))
-          dom.querySelector(".customValue").disabled = true;
-
-        updateCustomShortcutInputText(
-          dom.querySelector(".customKey"),
-          item["key"]
-        );
-        dom.querySelector(".customValue").value = item["value"];
-        dom.querySelector(".customForce").value = item["force"];
       }
-    }
+      });
   });
 }
 
 function restore_defaults() {
-  chrome.storage.sync.set(tcDefaults, function () {
-    restore_options();
-    document
-      .querySelectorAll(".removeParent")
-      .forEach((button) => button.click()); // Remove added shortcuts
-    updateStatus("Default options restored");
-  });
+  chrome.storage.sync.clear();
+  chrome.storage.sync.set(
+    settings_defaults,
+    () => {
+      restore_options();
+      // Remove buttons for non-default keybinds
+      document
+        .querySelectorAll(".removeParent")
+        .forEach((button) => button.click());
+      updateStatus("Default options restored");
+    }
+  );
 }
 
 function show_experimental() {
@@ -246,7 +219,24 @@ function show_experimental() {
     .forEach((item) => (item.style.display = "inline-block"));
 }
 
+function addSettingsToDOM() {
+  Object.keys(settings).forEach(addSettingToDOM);
+}
+function addSettingToDOM(s) {
+  if (settings[s].html) {
+    document.getElementById("settings").innerHTML += settings[s].html;
+  } else if (settings[s].description) {
+    document.getElementById("settings").innerHTML += `\
+<div class="row">
+  <label for="${s}">${settings[s].description}</label>
+  <input id="${s}" type="${settings[s].type === "b" ? "checkbox" : "text"}" />
+</div>
+`;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+  addSettingsToDOM();
   restore_options();
 
   document.getElementById("save").addEventListener("click", save_options);
