@@ -4,6 +4,7 @@ export const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 // The default values for each setting
 export const tcDefaults = {
+  enabled: true,
   // The default speed videos should play with
   speed: 1.0,
   //TODO is this value used? I don't see why it should be needed, can probably be refactored out?
@@ -12,7 +13,6 @@ export const tcDefaults = {
   audioBoolean: false,
   startHidden: false,
   forceLastSavedSpeed: false,
-  enabled: true,
   controllerOpacity: 0.3,
   controllerSize: "13px",
   keyBindings: [

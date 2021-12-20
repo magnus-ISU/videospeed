@@ -2,13 +2,13 @@
 //import {regStrip, tcDefaults} from "./constants.js";
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const tcDefaults = {
+  enabled: true,
   speed: 1.0,
   displayKey: "v",
   rememberSpeed: false,
   audioBoolean: false,
   startHidden: false,
   forceLastSavedSpeed: false,
-  enabled: true,
   controllerOpacity: 0.3,
   controllerSize: "13px",
   keyBindings: [
@@ -31,9 +31,8 @@ teams.microsoft.com
 // TODO parts of this this may be able to be refactored out by using tcDefaults
 var tc = {
   settings: {
-    lastSpeed: 1.0, // default 1x
     enabled: true,
-    speeds: {}, // empty object to hold speed for each source
+    lastSpeed: 1.0, // default 1x
 
     displayKey: tcDefaults.displayKey,
     rememberSpeed: tcDefaults.rememberSpeed,
@@ -42,8 +41,10 @@ var tc = {
     startHidden: tcDefaults.startHidden,
     controllerOpacity: tcDefaults.controllerOpacity,
     controllerSize: tcDefaults.controllerSize,
-    keyBindings: [],
     blacklist: tcDefaults.blacklist,
+
+    keyBindings: [],
+    speeds: {}, // empty object to hold speed for each source
     logLevel: 3
   },
 
