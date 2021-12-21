@@ -54,10 +54,9 @@ export const settings = {
   blacklist: {
     type: "s",
     default: `\
-www.instagram.com
-twitter.com
-imgur.com
 teams.microsoft.com
+hangouts.google.com
+meet.google.com
 `,
     html: `\
 <label for="blacklist"

@@ -23,10 +23,9 @@ const settings_defaults = {
     { action: "fast", key: "g", value: 2.5, force: false, predefined: true }
   ],
   blacklist: `\
-www.instagram.com
-twitter.com
-imgur.com
 teams.microsoft.com
+hangouts.google.com
+meet.google.com
 `
 };
 
