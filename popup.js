@@ -1,14 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("version").innerHTML = "v" + chrome.runtime.getManifest().version;
+
   document.querySelector("#config").addEventListener("click", function () {
     window.open(chrome.runtime.getURL("options.html"));
   });
 
   document.querySelector("#about").addEventListener("click", function () {
-    window.open("https://github.com/magnus-ISU/videospeed");
+    window.open(chrome.runtime.getManifest().homepage_url);
   });
 
   document.querySelector("#feedback").addEventListener("click", function () {
-    window.open("https://github.com/magnus-ISU/videospeed/issues");
+    window.open(chrome.runtime.getManifest().homepage_url + "/issues");
   });
 
   document.querySelector("#enable").addEventListener("click", function () {
@@ -42,9 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const suffix = `${enabled ? "" : "_disabled"}.png`;
     chrome.browserAction.setIcon({
       path: {
-        "19": "icons/icon19" + suffix,
-        "38": "icons/icon38" + suffix,
-        "48": "icons/icon48" + suffix
+        19: "icons/icon19" + suffix,
+        38: "icons/icon38" + suffix,
+        48: "icons/icon48" + suffix
       }
     });
   }

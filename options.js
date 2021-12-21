@@ -55,26 +55,28 @@ function updateCustomShortcutInputText(inputItem, key) {
 const customActionsNoValues = ["pause", "muted", "mark", "jump", "display"];
 
 function add_shortcut() {
-  const html = `<select class="customDo">
-    <option value="slower">Decrease speed</option>
-    <option value="faster">Increase speed</option>
-    <option value="rewind">Rewind</option>
-    <option value="advance">Advance</option>
-    <option value="reset">Reset speed</option>
-    <option value="fast">Preferred speed</option>
-    <option value="muted">Mute</option>
-    <option value="pause">Pause</option>
-    <option value="mark">Set marker</option>
-    <option value="jump">Jump to marker</option>
-    <option value="display">Show/hide controller</option>
-    </select>
-    <input class="customKey" type="text" placeholder="press a key"/>
-    <input class="customValue" type="text" placeholder="value (0.10)"/>
-    <select class="customForce">
-    <option value="false">Do not disable website key bindings</option>
-    <option value="true">Disable website key bindings</option>
-    </select>
-    <button class="removeParent">X</button>`;
+  const html = `\
+<select class="customDo">
+  <option value="slower">Decrease speed</option>
+  <option value="faster">Increase speed</option>
+  <option value="rewind">Rewind</option>
+  <option value="advance">Advance</option>
+  <option value="reset">Reset speed</option>
+  <option value="fast">Preferred speed</option>
+  <option value="muted">Mute</option>
+  <option value="pause">Pause</option>
+  <option value="mark">Set marker</option>
+  <option value="jump">Jump to marker</option>
+  <option value="display">Show/hide controller</option>
+</select>
+<input class="customKey" type="text" placeholder="press a key"/>
+<input class="customValue" type="text" placeholder="value (0.10)"/>
+<select class="customForce">
+  <option value="false">Do not disable website key bindings</option>
+  <option value="true">Disable website key bindings</option>
+</select>
+<button class="removeParent">X</button>
+`;
   var div = document.createElement("div");
   div.setAttribute("class", "row customs");
   div.innerHTML = html;
