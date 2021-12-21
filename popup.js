@@ -6,11 +6,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelector("#about").addEventListener("click", function () {
-    window.open("https://github.com/magnus-ISU/videospeed");
+    window.open(chrome.runtime.getManifest().homepage_url);
   });
 
   document.querySelector("#feedback").addEventListener("click", function () {
-    window.open("https://github.com/magnus-ISU/videospeed/issues");
+    window.open(chrome.runtime.getManifest().homepage_url + "/issues");
   });
 
   document.querySelector("#enable").addEventListener("click", function () {
