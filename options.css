@@ -8,13 +8,8 @@
 }
 
 :root {
-  --clr-primary-gray: 112 112 112;
-  --clr-secondary-gray: 238 238 238;
+  /* Space between sections */
   --gutter: 1.75rem;
-}
-
-:any-link {
-  color: inherit;
 }
 
 body {
@@ -39,6 +34,22 @@ header {
     color: #ccc;
     background-color: #223;
   }
+  button {
+    color: #dff;
+    background-color: #446;
+    box-shadow: 0 2px 3px rgba(0 0 0 / .08), inset 0 -2px 3px rgba(0 0 0 / .15);
+  }
+  button:hover {
+    background-color: #668;
+  }
+  input,
+  select,
+  textarea {
+    border-radius: 9px;
+    color: #dff;
+    background-color: #111;
+    border: 2px solid black;
+  }
 }
 
 main {
@@ -50,6 +61,12 @@ main {
 section {
   margin: var(--gutter) 0;
 }
+section:not(#customs) {
+  text-align: center;
+}
+section#customs {
+  margin-left: 50px;
+}
 
 /* Header title */
 h1 {
@@ -59,22 +76,10 @@ h1 {
 }
 
 /* Section titles */
-h3,
-h4 {
+h3 {
   font-weight: 600;
   margin: 1em 0 .25em;
-}
-
-h3 {
   font-size: 1.25rem;
-}
-
-h4 {
-  font-size: 1rem;
-}
-
-p {
-  margin-bottom: .5em;
 }
 
 .row {
@@ -92,7 +97,7 @@ select {
   width: 12em;
 }
 
-input[type="text"] {
+input {
   text-align: center;
   width: 6em;
 }
@@ -119,10 +124,24 @@ label {
   margin-right: .75rem;
   vertical-align: top;
   width: 20em;
+  text-align: left;
 }
 
 #status {
   height: 1rem;
   font: .5rem;
   color: red;
+}
+
+.hide {
+  display: none;
+}
+
+:any-link {
+  color: inherit;
+}
+
+#popup {
+  width: 25em;
+  height: 30em;
 }
