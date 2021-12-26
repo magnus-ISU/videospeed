@@ -287,6 +287,9 @@ function escapeStringRegExp(str) {
 function isBlacklisted() {
   var is_blacklisted = false;
   cached_settings.blacklist.split("\n").forEach((match) => {
+    if (is_blacklisted) {
+      return;
+    }
     match = match.replace(regStrip, "");
     if (match.length == 0) {
       return;
@@ -489,7 +492,9 @@ function initializeNow(document) {
         }
 
         // TODO make keybindings a map so we can make this O(1)
-        let item = cached_settings.keybindings.find((item) => item.key === event.key);
+        let item = cached_settings.keybindings.find(
+          (item) => item.key === event.key
+        );
         if (item) {
           runAction(item.action, item.value);
           if (item.force === "true") {

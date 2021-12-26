@@ -111,14 +111,16 @@ function validate_blacklist() {
   const blacklist = document.getElementById("blacklist");
   const status = document.getElementById("status");
   blacklist.value.split("\n").forEach((match) => {
+    if (!valid_blacklist) {
+      return;
+    }
     match = match.replace(regStrip, "");
-    
+
     if (match.startsWith("/")) {
       try {
         const parts = match.split("/");
 
-        if (parts.length < 3)
-          throw "invalid regex";
+        if (parts.length < 3) throw "invalid regex";
 
         const flags = parts.pop();
         const regex = parts.slice(1).join("/");
@@ -126,14 +128,15 @@ function validate_blacklist() {
         const _ = new RegExp(regex, flags);
       } catch (err) {
         status.textContent =
-          "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
+          'Error: Invalid blacklist regex: "' +
+          match +
+          '". Unable to save. Try wrapping it in foward slashes.';
         valid_blacklist = false;
         return;
       }
     }
   });
   return valid_blacklist;
-
 }
 
 // Saves options to chrome.storage
@@ -184,10 +187,12 @@ function restore_options() {
               document.querySelector("#" + item["action"] + " .customKey"),
               item["key"]
             );
-            document.querySelector("#" + item["action"] + " .customValue").value =
-              item["value"];
-            document.querySelector("#" + item["action"] + " .customForce").value =
-              item["force"];
+            document.querySelector(
+              "#" + item["action"] + " .customValue"
+            ).value = item["value"];
+            document.querySelector(
+              "#" + item["action"] + " .customForce"
+            ).value = item["force"];
           } else {
             // new ones
             add_shortcut();
@@ -206,23 +211,20 @@ function restore_options() {
           }
         }
       }
-      });
+    });
   });
 }
 
 function restore_defaults() {
   chrome.storage.sync.clear();
-  chrome.storage.sync.set(
-    settings_defaults,
-    () => {
-      restore_options();
-      // Remove buttons for non-default keybinds
-      document
-        .querySelectorAll(".removeParent")
-        .forEach((button) => button.click());
-      updateStatus("Default options restored");
-    }
-  );
+  chrome.storage.sync.set(settings_defaults, () => {
+    restore_options();
+    // Remove buttons for non-default keybinds
+    document
+      .querySelectorAll(".removeParent")
+      .forEach((button) => button.click());
+    updateStatus("Default options restored");
+  });
 }
 
 function show_experimental() {
