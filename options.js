@@ -107,23 +107,33 @@ function createKeyBindings(item) {
 // Validates blacklist before saving
 // TODO this function is hot garbage
 function validate_blacklist() {
-  let status = document.getElementById("status");
-  document
-    .getElementById("blacklist")
-    .value.split("\n")
-    .forEach((match) => {
-      match = match.replace(regStrip, "");
-      if (match.startsWith("/")) {
-        try {
-          var regexp = new RegExp(match);
-        } catch (err) {
-          status.textContent =
-            "Error: Invalid blacklist regex: " + match + ". Unable to save";
-          return false;
-        }
+  let valid_blacklist = true;
+  const blacklist = document.getElementById("blacklist");
+  const status = document.getElementById("status");
+  blacklist.value.split("\n").forEach((match) => {
+    match = match.replace(regStrip, "");
+    
+    if (match.startsWith("/")) {
+      try {
+        const parts = match.split("/");
+
+        if (parts.length < 3)
+          throw "invalid regex";
+
+        const flags = parts.pop();
+        const regex = parts.slice(1).join("/");
+
+        const _ = new RegExp(regex, flags);
+      } catch (err) {
+        status.textContent =
+          "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
+        valid_blacklist = false;
+        return;
       }
-    });
-  return true;
+    }
+  });
+  return valid_blacklist;
+
 }
 
 // Saves options to chrome.storage

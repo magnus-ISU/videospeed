@@ -268,7 +268,7 @@ function defineVideoController() {
         break;
       case location.hostname === "tv.apple.com":
         // insert after parent for correct stacking context
-        p.getRootNode().querySelector(".scrim").prepend(fragment);
+        p = p.parentElement;
       default:
       // Note: When triggered via a MutationRecord, it's possible that the
       // target is not the immediate parent. This appends the controller as
@@ -285,6 +285,7 @@ function escapeStringRegExp(str) {
 }
 
 function isBlacklisted() {
+  var is_blacklisted = false;
   cached_settings.blacklist.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
     if (match.length == 0) {
@@ -293,8 +294,16 @@ function isBlacklisted() {
 
     if (match.startsWith("/")) {
       try {
-        var regexp = new RegExp(match);
+        let parts = match.split("/");
+        let flags = "";
+        var regex = match;
+        if (/\/(?!.*(.).*\1)[gimsuy]*$/.test(match)) {
+          flags = parts.pop();
+          regex = parts.slice(1).join("/");
+        }
+        regexp = new RegExp(regex, flags);
       } catch (err) {
+        // happens if somehow a bad regex is supplied by user and not sanitized
         return;
       }
     } else {
@@ -302,11 +311,10 @@ function isBlacklisted() {
     }
 
     if (regexp.test(location.href)) {
-      blacklisted = true;
-      return;
+      is_blacklisted = true;
     }
   });
-  return false;
+  return is_blacklisted;
 }
 
 function setupListener() {
