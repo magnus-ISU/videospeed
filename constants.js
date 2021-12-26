@@ -66,7 +66,7 @@ meet.google.com
   <em>
     <a href="https://www.regexpal.com/">Regex</a> is supported.<br />
     Be sure to use the literal notation.<br />
-    e.g. /(.+)youtube\.com(\/*)$/gi
+    e.g. /(.+)youtube\\.com(\\/.*)$/gi
   </em>
 </label>
 <textarea
