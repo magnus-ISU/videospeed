@@ -8,10 +8,10 @@ The major difference (as of 19 December 2021) is that CodeBicycle lags behind th
  - Patches to the settings UI which gives it a better dark theme
  - Breaking changes to the settings menu which allow for more fine-grained handling of keyboard input
  - Some fixes for specific websites such as netflix and reddit
- - Ctrl+Shift+Mousewheel speeds up or slows down playback
+ - Shift+Mousewheel speeds up or slows down playback
  - (Some) settings can be changed without reloading a page, notably keybindings
 
-Because I have seen how backwards compatability left crusty code in the original versions for multiple years while I rewrote large sections of it, I will make no promises about this extension working between versions. A complete reinstall of the extension may be (but probably will not be) required on every update, so I can iterate more quickly and correctly.
+Because I have seen how backwards compatability left crusty code in the original versions for multiple years while I rewrote large sections of it, I will make no promises about this extension working between versions. Clicking 'Restore Defaults' may be (but probably will not be) required on every update, so I can iterate more quickly and correctly.
 
 ## FAQ:
 
