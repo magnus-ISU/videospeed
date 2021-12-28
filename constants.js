@@ -26,7 +26,7 @@ export const settings = {
   scrollDisabled: {
     type: "b",
     default: false,
-    description: "Disable Ctrl+Shift+Scroll"
+    description: "Disable Shift+Scroll to change speed"
   },
   controllerOpacity: {
     type: "i",

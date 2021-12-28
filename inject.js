@@ -516,7 +516,7 @@ function initializeNow(document) {
           if (cached_settings.scrollDisabled) {
             return;
           }
-          if (!event.ctrlKey || !event.shiftKey) {
+          if (!event.shiftKey) {
             return;
           }
           event.preventDefault();
