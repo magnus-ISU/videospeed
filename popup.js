@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("version").innerHTML = "v" + chrome.runtime.getManifest().version;
+  document.getElementById("version").innerText = "v" + chrome.runtime.getManifest().version;
 
   document.querySelector("#config").addEventListener("click", function () {
     window.open(chrome.runtime.getURL("options.html"));
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function setStatusMessage(str) {
-    const status_element = document.querySelector("#status");
+    const status_element = document.getElementById("status");
     status_element.classList.toggle("hide", false);
     status_element.innerText = str;
   }
