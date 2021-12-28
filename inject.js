@@ -249,10 +249,13 @@ function defineVideoController() {
     let p = this.parent;
     // This seemed strange at first, but switching on true here allows matching regexes
     switch (true) {
+      // Insert before parent to bypass overlay
       case location.hostname === "www.amazon.com":
       case /\.*.reddit.com/.test(location.hostname):
       case /hbogo\./.test(location.hostname):
-        // Insert before parent to bypass overlay
+      case location.hostname === "www.youtube.com":
+      // insert after parent for correct stacking context
+      case location.hostname === "tv.apple.com":
         p = p.parentElement;
         break;
       case location.hostname === "www.facebook.com":
@@ -266,9 +269,6 @@ function defineVideoController() {
       case location.hostname === "www.netflix.com":
         p = p.parentElement.parentElement.parentElement;
         break;
-      case location.hostname === "tv.apple.com":
-        // insert after parent for correct stacking context
-        p = p.parentElement;
       default:
       // Note: When triggered via a MutationRecord, it's possible that the
       // target is not the immediate parent. This appends the controller as

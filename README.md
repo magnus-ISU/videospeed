@@ -7,7 +7,7 @@ This fork is available on AMO here: https://addons.mozilla.org/firefox/addon/vid
 The major difference (as of 19 December 2021) is that CodeBicycle lags behind the chromium version, while this repository has some PRs for the chromium version and the following further changes:
  - Patches to the settings UI which gives it a better dark theme
  - Breaking changes to the settings menu which allow for more fine-grained handling of keyboard input
- - Some fixes for specific websites such as netflix and reddit
+ - Some fixes for specific websites such as netflix, reddit, and youtube
  - Shift+Mousewheel speeds up or slows down playback
  - (Some) settings can be changed without reloading a page, notably keybindings
 
