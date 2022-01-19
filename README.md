@@ -15,10 +15,6 @@ Because I have seen how backwards compatability left crusty code in the original
 
 ## FAQ:
 
-**There's no audio above 4x speed!**
-
-Quite annoying indeed. [This is a bug in firefox itself, not the extension](https://bugzilla.mozilla.org/show_bug.cgi?id=1630569). Presently, nothing can be done about it.
-
 **A website doesn't work!**
 
 Open an issue here *with a link to a URL that has some odd behavior*.
@@ -26,6 +22,12 @@ Open an issue here *with a link to a URL that has some odd behavior*.
 Websites known to have problems:
  - [Soundcloud](https://github.com/codebicycle/videospeed/issues/163)
  - [Regular](https://github.com/codebicycle/videospeed/issues/155) `mp4`s opened with `file:///` links
+
+**There's no audio above 4x speed!**
+
+This used to be quite annoying indeed. [This was a bug in firefox itself, not the extension](https://bugzilla.mozilla.org/show_bug.cgi?id=1630569). However, the bug is resolved! Now audio plays up to 8x speed (where it is intelligible chatter anyway). So if you still aren't hearing anything, please verify your version of Firefox is up to date.
+
+Previously shift+scrollwheel would pause briefly at 4x speed because audio would stop above that. Since I find it extremely difficult to understand anything faster anyway, I believe this is still good default behavior. If anyone else disagrees, please open an issue; it can be turned into a configuration option if someone really wants it.
 
 # The science of accelerated playback
 
