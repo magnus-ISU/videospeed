@@ -5,8 +5,6 @@ import {
 	objectMap
 } from "./constants.js";
 
-var keyBindings = [];
-
 function recordKeyPress(e) {
 	if (
 		(e.keyCode >= 48 && e.keyCode <= 57) || // Numbers 0-9
