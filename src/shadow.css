@@ -1,89 +1,89 @@
 * {
-  line-height: 1.9em;
-  font-family: sans-serif;
+	line-height: 1.9em;
+	font-family: sans-serif;
 }
 
 :host(:hover) #controls {
-  display: inline;
+	display: inline;
 }
 
 #controller {
-  position: absolute;
-  top: 0;
-  left: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
 
-  background: black;
-  color: white;
+	background: black;
+	color: white;
 
-  border-radius: 0.4em;
-  padding: 0.4em;
-  margin: 4px;
+	border-radius: 0.4em;
+	padding: 0.4em;
+	margin: 4px;
 
-  cursor: default;
-  z-index: 9999999;
+	cursor: default;
+	z-index: 9999999;
 }
 
 #controller:hover {
-  opacity: 0.7;
+	opacity: 0.7;
 }
 
 #controller:hover > .draggable {
-  margin-right: 0.8em;
+	margin-right: 0.8em;
 }
 
 #controls {
-  display: none;
+	display: none;
 }
 
 #controller.dragging {
-  cursor: -webkit-grabbing;
-  cursor: -moz-grabbing;
-  opacity: 0.7;
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
+	opacity: 0.7;
 }
 
 #controller.dragging #controls {
-  display: inline;
+	display: inline;
 }
 
 .draggable {
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
 }
 
 .draggable:active {
-  cursor: -webkit-grabbing;
-  cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
 }
 
 button {
-  cursor: pointer;
-  color: black;
-  background: white;
-  font-weight: bold;
-  border-radius: 0.4em;
-  padding: 0.4em 0.55em 0.4em 0.55em;
-  line-height: 0.5em;
-  border: 1px solid white;
-  font-family: "Lucida Console", Monaco, monospace;
+	cursor: pointer;
+	color: black;
+	background: white;
+	font-weight: bold;
+	border-radius: 0.4em;
+	padding: 0.4em 0.55em 0.4em 0.55em;
+	line-height: 0.5em;
+	border: 1px solid white;
+	font-family: "Lucida Console", Monaco, monospace;
 }
 
 button:focus {
-  outline: 0;
+	outline: 0;
 }
 
 button:hover {
-  opacity: 1;
+	opacity: 1;
 }
 
 button:active {
-  background: #ccc;
+	background: #ccc;
 }
 
 button.rw {
-  opacity: 0.65;
+	opacity: 0.65;
 }
 
 button.hideButton {
-  opacity: 0.65;
-  margin-right: 2px;
+	opacity: 0.65;
+	margin-right: 2px;
 }

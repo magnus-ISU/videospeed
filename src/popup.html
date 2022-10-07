@@ -1,36 +1,53 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <html>
-  <head>
-    <title>Video Speed Controller: Popup</title>
-    <link rel="stylesheet" href="options.css" />
-    <script src="popup.js"></script>
-  </head>
-  <body>
-    <div id="popup">
-      <section>
-        <h3>Video Speed Controller</h3>
-	<div style="font-style: italic; font-size: 0.6em;">Magnus' fork</div>
-        <div id="version"></div>
-      </section>
-      <section>
-        <div class="row">
-          <button id="enable" class="hide">Enable</button>
-          <button id="disable">Disable</button>
-        </div>
-        <span id="status" class="hide"></span>
-        <hr />
-        <div class="row">
-          <button id="config">Settings</button>
-        </div>
-        <hr />
-        <div class="row">
-          <button id="feedback" class="secondary">Send feedback</button>
-        </div>
-        <div class="row">
-          <button id="about" class="secondary">About</button>
-        </div>
-      </section>
-    </div>
-  </body>
+	<head>
+		<title>Video Speed Controller: Popup</title>
+		<link rel="stylesheet" href="options.css" />
+		<script src="popup.js"></script>
+	</head>
+	<body>
+		<div id="popup">
+			<section>
+				<h3>Video Speed Controller</h3>
+				<div style="font-style: italic; font-size: 0.6em;">Magnus' fork</div>
+				<div id="version"></div>
+			</section>
+			<section>
+				<!-- Duplicated from inject.js - keep it synchronized -->
+				<style>
+					* { font-size:20px; }
+				</style>
+
+				<div id="controller">
+					<span id="controls">
+						<button data-action="rewind" class="rw">«</button>
+						<button data-action="slower">&minus;</button>
+						<button data-action="display" class="hideButton">O</button>
+						<button data-action="faster">&plus;</button>
+						<button data-action="advance" class="rw">»</button>
+					</span>
+				</div>
+				<!-- End duplication -->
+			</section>
+			<section>
+				<div class="row">
+					<button id="enable" class="hide">Enable</button>
+					<button id="disable">Disable</button>
+				</div>
+				<span id="status" class="hide"></span>
+				<hr />
+				<div class="row">
+					<button id="config">Settings</button>
+				</div>
+				<hr />
+				<div class="row">
+					<button id="feedback" class="secondary">Send feedback</button>
+				</div>
+				<div class="row">
+					<button id="about" class="secondary">About</button>
+				</div>
+			</section>
+		</div>
+	</body>
 </html>
