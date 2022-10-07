@@ -198,8 +198,8 @@ function defineVideoController() {
 				</style>
 
 				<div id="controller" style="top:${top}; left:${left}; opacity:${
-			cached_settings.controllerOpacity
-		};">
+					cached_settings.controllerOpacity
+				};">
 					<span data-action="drag" class="draggable">${speed}</span>
 					<span id="controls">
 						<button data-action="rewind" class="rw">«</button>
@@ -702,6 +702,7 @@ function runAction(action, value, e) {
 				log("Fast forward", 5)
 				v.currentTime += value
 			} else if (action === "faster") {
+				console.log(v)
 				addSpeed(v, value)
 			} else if (action === "slower") {
 				addSpeed(v, -value)
