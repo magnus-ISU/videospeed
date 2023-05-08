@@ -1,10 +1,11 @@
 ## Info
 
-This is a fork of [CodeBicycle's fork](https://github.com/codebicycle/videospeed) of the [Chromium upstream](https://github.com/igrigorik/videospeed).
+This is a fork of the [popular chrome extension](https://github.com/igrigorik/videospeed).
 
-This fork is available on AMO here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/
+It is available on firefox here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/  
+It will soon be available on the chrome web store?
 
-The major difference (as of 28 December 2021) is that CodeBicycle lags behind the chromium version, while this repository has some PRs for the chromium version and the following further changes:
+The major differences (as of 2023 May 08):
  - Patches to the settings UI which gives it a better dark theme
  - Breaking changes to the settings menu which allow for more fine-grained handling of keyboard input
  - Some fixes for specific websites such as netflix, reddit, and youtube
@@ -22,12 +23,6 @@ Open an issue here *with a link to a URL that has some odd behavior*.
 Websites known to have problems:
  - [Soundcloud](https://github.com/codebicycle/videospeed/issues/163)
  - [Regular](https://github.com/codebicycle/videospeed/issues/155) `mp4`s opened with `file:///` links
-
-**There's no audio above 4x speed!**
-
-This used to be quite annoying indeed. [This was a bug in firefox itself, not the extension](https://bugzilla.mozilla.org/show_bug.cgi?id=1630569). However, the bug is resolved! Now audio plays up to 8x speed (where it is intelligible chatter anyway). So if you still aren't hearing anything, please verify your version of Firefox is up to date.
-
-Previously shift+scrollwheel would pause briefly at 4x speed because audio would stop above that. Since I find it extremely difficult to understand anything faster anyway, I believe this is still good default behavior. If anyone else disagrees, please open an issue; it can be turned into a configuration option if someone really wants it.
 
 # The science of accelerated playback
 
