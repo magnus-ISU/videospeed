@@ -22,14 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		toggleEnabled(false, settingsSavedReloadMessage)
 	})
 
-	// TODO make the buttons actually change things on the page
-	document.querySelector("reset").addEventListener("click", function () {
-		const tabId = chrome.tabs.tabId
-		chrome.tabs.executeScript(
-			() => {alert('test')}
-		)
-	})
-
 	chrome.storage.sync.get({ enabled: true }, function (storage) {
 		toggleEnabledUI(storage.enabled)
 	})
