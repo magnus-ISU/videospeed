@@ -26,7 +26,8 @@ const settings_defaults = {
 teams.microsoft.com
 hangouts.google.com
 meet.google.com
-`
+`,
+	customCSS: ""
 }
 
 //////////////////////// BEGIN INJECT.JS /////////////////////////
@@ -192,6 +193,7 @@ function defineVideoController() {
 		var shadowTemplate = `
 				<style>
 					@import "${chrome.runtime.getURL("shadow.css")}";
+					${cached_settings.customCSS}
 					* {
 						font-size:${cached_settings.controllerSize}px;
 					}

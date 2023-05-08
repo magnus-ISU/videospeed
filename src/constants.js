@@ -76,6 +76,21 @@ meet.google.com
 	spellcheck="false"
 ></textarea>
 `
+	},
+	customCSS: {
+		type: "s",
+		default: "",
+		html: `\
+<label for="customCSS"
+	>Custom CSS to style the controller<br />
+</label>
+<textarea
+	id="customCSS"
+	rows="10"
+	cols="50"
+	spellcheck="false"
+></textarea>
+`
 	}
 };
 
