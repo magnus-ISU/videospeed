@@ -1,9 +1,11 @@
+## Install
+
+It is available for Firefox here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/  
+and for Chrome here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/
+
 ## Info
 
 This is a fork of the [popular chrome extension](https://github.com/igrigorik/videospeed).
-
-It is available on firefox here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/  
-It will soon be available on the chrome web store?
 
 The major differences (as of 2023 May 08):
  - Patches to the settings UI which gives it a better dark theme
