@@ -873,9 +873,7 @@ function showController(controller) {
 	6 - debug high verbosity + stack trace on each message
 */
 function log(message, level) {
-	if (6 < level) {
-		return
-	}
+	return
 	let to_print = ""
 	switch (level) {
 		case 2:
