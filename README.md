@@ -2,8 +2,7 @@
 
 This is a fork of the [popular chrome extension](https://github.com/igrigorik/videospeed).
 
-It is available on firefox here: https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/  
-It will soon be available on the chrome web store?
+It is available on [firefox](https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/) and [chrome](https://chromewebstore.google.com/detail/video-speed-controller-ma/ncobejaglnlaffhoockhbijcgoekghjb)
 
 The major differences (as of 2023 May 08):
  - Patches to the settings UI which gives it a better dark theme
