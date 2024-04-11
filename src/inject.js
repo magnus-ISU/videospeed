@@ -10,6 +10,7 @@ const settings_defaults = {
 	enforceDefaultSpeed: false,
 	affectAudio: false,
 	scrollDisabled: false,
+	allow0x: false,
 	controllerOpacity: 0.3,
 	controllerSize: 14,
 	lastSpeed: 1.0,
@@ -627,39 +628,53 @@ function initializeNow(document) {
 }
 
 var speed_locked = false
-function addSpeed(v, speed) {
-	if (speed_locked) return
+function addSpeed(v, speed_difference) {
+	if (speed_locked) {
+		return
+	}
 	log("Changing speed", 5)
 
-	let orig_s = v.playbackRate <= MIN_SPEED ? 0.0 : v.playbackRate
-	let s = orig_s + speed
-	// Make sure no matter how small s is, we can increase it
-	if (s < MIN_SPEED) s = MIN_SPEED
-	// Clamp to max and min
-	s = Math.min(s, MAX_SPEED)
-	s = Math.max(s, MIN_SPEED)
+	let orig_speed = v.playbackRate
+	let new_speed = orig_speed + speed_difference
+
+	if (cached_settings.allow0x) {
+		// Skip range from 0 to MIN_SPEED if 0.00x enabled
+		if (0 < new_speed && new_speed < MIN_SPEED) {
+			if (speed_difference > 0) {
+				new_speed = MIN_SPEED
+			} else {
+				new_speed = 0
+			}
+		}
+	} else {
+		// Clamp to MIN_SPEED
+		new_speed = Math.max(new_speed, MIN_SPEED)
+	}
+
+	// Clamp to MAX_SPEED
+	new_speed = Math.min(new_speed, MAX_SPEED)
 
 	// If speed ends up within 0.9 to 1.1, predict the user wants to set it to 1 and clamp to that. Then disable changing speed for a quarter-second.
 	// But only if the user is moving towards 1
-	if (s < 1.0 && s > 0.9) {
-		if (orig_s < s) {
+	if (new_speed < 1.0 && new_speed > 0.9) {
+		if (speed_difference > 0) {
 			lockSpeed()
-			s = 1.0
+			new_speed = 1.0
 		}
-	} else if (s > 1.0 && s < 1.1) {
-		if (orig_s > s) {
+	} else if (new_speed > 1.0 && new_speed < 1.1) {
+		if (speed_difference < 0) {
 			lockSpeed()
-			s = 1.0
+			new_speed = 1.0
 		}
-	} else if (s < AUDIBLE_SPEED && s > AUDIBLE_SPEED - 0.1) {
+	} else if (new_speed < AUDIBLE_SPEED && new_speed > AUDIBLE_SPEED - 0.1) {
 		// Same, but for speeds moving up to max audio (and not down from it)
-		if (orig_s < s) {
+		if (speed_difference > 0) {
 			lockSpeed()
-			s = AUDIBLE_SPEED
+			new_speed = AUDIBLE_SPEED
 		}
 	}
 
-	setSpeed(v, s)
+	setSpeed(v, new_speed)
 }
 // Helper functions to run
 function unlockSpeed() {

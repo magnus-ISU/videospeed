@@ -28,6 +28,11 @@ export const settings = {
 		default: false,
 		description: "Disable Shift+Scroll to change speed"
 	},
+	allow0x: {
+		type: "b",
+		default: false,
+		description: "Allow 0.00x speed"
+	},
 	controllerOpacity: {
 		type: "i",
 		default: 0.3,
