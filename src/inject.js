@@ -10,7 +10,6 @@ const settings_defaults = {
 	enforceDefaultSpeed: false,
 	affectAudio: false,
 	scrollDisabled: false,
-	allow0x: false,
 	controllerOpacity: 0.3,
 	controllerSize: 14,
 	lastSpeed: 1.0,
@@ -637,18 +636,13 @@ function addSpeed(v, speed_difference) {
 	let orig_speed = v.playbackRate
 	let new_speed = orig_speed + speed_difference
 
-	if (cached_settings.allow0x) {
-		// Skip range from 0 to MIN_SPEED if 0.00x enabled
-		if (0 < new_speed && new_speed < MIN_SPEED) {
-			if (speed_difference > 0) {
-				new_speed = MIN_SPEED
-			} else {
-				new_speed = 0
-			}
+	// Skip range from 0 to MIN_SPEED
+	if (0 < new_speed && new_speed < MIN_SPEED) {
+		if (speed_difference > 0) {
+			new_speed = MIN_SPEED
+		} else {
+			new_speed = 0
 		}
-	} else {
-		// Clamp to MIN_SPEED
-		new_speed = Math.max(new_speed, MIN_SPEED)
 	}
 
 	// Clamp to MAX_SPEED
