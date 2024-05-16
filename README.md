@@ -5,6 +5,7 @@ This is a fork of the [popular chrome extension](https://github.com/igrigorik/vi
 ```
 cd src
 web-ext build
+web-ext run
 ```
 
 It is available on [firefox](https://addons.mozilla.org/firefox/addon/videospeed-magnus-fork/) and [chrome](https://chromewebstore.google.com/detail/video-speed-controller-ma/ncobejaglnlaffhoockhbijcgoekghjb)
